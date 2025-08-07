@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海姆达尔计划 (Linux Heimdall) - Linux 内核安全架构</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0F1A13;
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(0, 168, 89, 0.8), 0 0 10px rgba(0, 168, 89, 0.6);
+        }
+        .card {
+            background-color: #1B2D24;
+            border: 1px solid #005A34;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 90, 52, 0.2);
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: #00A859;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .step-connector {
+            width: 2px;
+            background-color: #005A34;
+            height: 2rem;
+            margin: -0.5rem auto;
+        }
+        .trust-chain-connector {
+            width: 2px;
+            height: 2rem;
+            background-color: #007A42;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <header class="text-center py-12 md:py-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="sticky top-4 z-10 p-2 bg-gradient-to-b from-[#1b2d24]/90 to-[#0f1a13]/90 backdrop-blur-sm border border-[#005A34] rounded-xl mb-8">
+                <div class="flex flex-wrap justify-between items-center gap-1 md:gap-2">
+                    <a href="#part1" class="flex-grow px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-[#00A859] hover:text-white transition-colors text-center">缺口分析</a>
+                    <a href="#part2" class="flex-grow px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-[#00A859] hover:text-white transition-colors text-center">架构蓝图</a>
+                    <a href="#part3" class="flex-grow px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-[#00A859] hover:text-white transition-colors text-center">实施研究</a>
+                    <a href="#part4" class="flex-grow px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-[#00A859] hover:text-white transition-colors text-center">实证验证</a>
+                    <a href="#part5" class="flex-grow px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-[#00A859] hover:text-white transition-colors text-center">战略价值</a>
+                    <a href="#part6" class="flex-grow px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-[#00A859] hover:text-white transition-colors text-center">结论展望</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+            <div class="flex justify-center items-center">
+                 <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Nils_Asplund_-_Heimdal.jpg" alt="北欧神话中的守护神海姆达尔的艺术图" class="rounded-lg shadow-2xl w-full border-2 border-[#005A34]" onerror="this.onerror=null;this.src='https://placehold.co/800x500/1B2D24/6BDBAD?text=Heimdall+Art';">
+            </div>
+        </div>
+
+        <div class="max-w-3xl mx-auto px-4 mb-12">
+            <h3 class="text-xl font-bold text-[#6BDBAD]">项目命名缘由：神话与技术的交汇</h3>
+            <p class="text-sm mt-2 text-gray-400">在北欧神话中，守护神海姆达尔以其超凡的感知力和警惕性著称。本项目借其之名，旨在强调其核心使命：为Linux内核构建一个不知疲倦、洞察秋毫、且反应迅速的终极守护者。</p>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-glow text-white">海姆达尔计划</h1>
+        <h2 class="text-2xl md:text-4xl font-bold text-white mt-2">Linux Heimdall</h2>
+    </header>
+
+    <div class="text-center p-8 border-y border-y-[#005A34] my-12 container mx-auto">
+        <p class="font-bold text-xl text-white">Linux Heimdall</p>
+        <p class="text-[#6BDBAD]">一个开源的Linux内核安全强化项目</p>
+        <a href="https://github.com/auveggry/Linux-Heimdall" target="_blank" class="inline-block mt-4 px-6 py-2 bg-[#00A859] text-white font-bold rounded-lg hover:bg-[#00C266] transition-colors">在 GitHub 上查看</a>
+    </div>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <section id="part1" class="mb-20 pt-16 -mt-16">
+            <h3 class="text-3xl font-bold text-center mb-10 text-glow">第一部分: 完整性缺口分析</h3>
+            <div class="card p-6 rounded-lg mb-8">
+                <h4 class="text-2xl font-bold text-center text-[#00A859] mb-6">1.1 安全启动的幻象：信任链的断裂点</h4>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="p-3 bg-green-800 rounded-lg w-56 text-center font-bold">UEFI Firmware</div>
+                        <div class="trust-chain-connector"></div>
+                        <div class="p-3 bg-green-800 rounded-lg w-56 text-center font-bold">Bootloader</div>
+                        <div class="trust-chain-connector"></div>
+                        <div class="p-3 bg-green-800 rounded-lg w-56 text-center font-bold">Kernel Loaded</div>
+                        <div class="w-full h-2 my-3 flex items-center justify-center">
+                            <div class="w-full h-px bg-red-500"></div>
+                            <span class="text-3xl text-red-500 bg-[#1B2D24] px-2">⚡️</span>
+                            <div class="w-full h-px bg-red-500"></div>
+                        </div>
+                        <div class="p-3 bg-red-800 rounded-lg w-56 text-center font-bold">Runtime Vulnerable</div>
+                    </div>
+                    <div>
+                        <ul class="space-y-6">
+                            <li class="flex items-start">
+                                <span class="text-3xl mr-4">🛡️</span>
+                                <div>
+                                    <h5 class="font-bold text-green-400">阶段一：启动时验证</h5>
+                                    <p class="text-sm text-gray-400">UEFI固件验证引导加载器和内核的签名，确保启动过程的初始纯洁性。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-3xl mr-4">🏁</span>
+                                <div>
+                                    <h5 class="font-bold text-yellow-400">阶段二：信任交接</h5>
+                                    <p class="text-sm text-gray-400">内核成功加载后，安全启动的使命完成。信任链在此刻交接，但传统上并未延续。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-3xl mr-4">🚨</span>
+                                <div>
+                                    <h5 class="font-bold text-red-400">阶段三：运行时风险暴露</h5>
+                                    <p class="text-sm text-gray-400">所有用户空间的应用、库和配置文件都处于无监控状态，为攻击者留下了广阔的攻击面。</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">1.2 运行时威胁：系统内部的背叛</h4>
+                    <div class="mt-6">
+                        <div class="grid grid-cols-3 items-center text-center gap-2">
+                            <div>
+                                <h5 class="font-bold text-green-400">事前: 合法执行</h5>
+                                <p class="text-4xl my-2">💻</p>
+                                <p class="font-mono text-xs bg-gray-700 p-1 rounded">/bin/sudo</p>
+                                <p class="text-xs mt-1">内核验证路径和权限</p>
+                                <p class="text-2xl mt-2 text-green-400">✅</p>
+                            </div>
+                            <div class="relative text-center">
+                                <div class="text-4xl text-red-500">→</div>
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1B2D24] px-1">
+                                    <p class="text-4xl">🦠</p>
+                                </div>
+                                <p class="text-xs text-red-400 mt-2">恶意软件注入</p>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-red-400">事后: 恶意行为</h5>
+                                <p class="text-4xl my-2">💀</p>
+                                <p class="font-mono text-xs bg-red-900/80 p-1 rounded">/bin/sudo</p>
+                                <p class="text-xs mt-1">内容已被篡改</p>
+                                <p class="text-2xl mt-2 text-red-400">🔓</p>
+                            </div>
+                        </div>
+                         <div class="w-full text-center text-2xl my-3 text-red-500">↓</div>
+                        <h5 class="font-bold text-red-400 text-center mb-2">关键漏洞：内核的盲点</h5>
+                         <div class="bg-black/50 p-4 rounded-lg border border-red-500 text-center">
+                            <p class="text-sm">传统内核在执行文件时，信任的是文件的**路径**而非**内容**。它检查用户是否有权限执行<code class="font-mono text-xs">/bin/sudo</code>，但它无法感知到该路径指向的文件内容已被恶意替换。这是运行时完整性保护的核心动机。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">1.3 离线威胁：“邪恶女仆”攻击</h4>
+                    <div class="mt-6">
+                        <h5 class="font-bold text-yellow-400 text-center mb-2">攻击者路径</h5>
+                        <div class="flex justify-around items-center text-center text-sm">
+                            <div><p class="text-3xl">👻</p><p>物理接触</p></div>
+                            <div class="text-2xl text-gray-500">→</div>
+                            <div><p class="text-3xl">💾</p><p>离线挂载</p></div>
+                            <div class="text-2xl text-gray-500">→</div>
+                            <div><p class="text-3xl">📝</p><p>篡改文件</p></div>
+                        </div>
+                        <div class="w-full text-center text-2xl my-3 text-red-500">↓</div>
+                        <h5 class="font-bold text-red-400 text-center mb-2">关键漏洞：仅有IMA的系统为何会失效？</h5>
+                        <div class="bg-black/50 p-4 rounded-lg border border-red-500">
+                            <p class="text-sm mb-2">攻击者不仅修改了文件内容，还利用离线权限，重新计算并覆盖了文件的“合法”哈希值。</p>
+                            <div class="font-mono text-xs">
+                                <p><span class="text-red-400">1. # echo 'malware' > /bin/sudo</span></p>
+                                <p><span class="text-red-400">2. # new_hash=$(sha256sum /bin/sudo)</span></p>
+                                <p><span class="text-red-400">3. # setfattr -n security.ima -v $new_hash /bin/sudo</span></p>
+                            </div>
+                             <p class="text-sm mt-2 text-center text-yellow-300">当系统重启后，IMA会发现哈希匹配，从而错误地信任了被篡改的文件！</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part2" class="mb-20 pt-16 -mt-16">
+            <h3 class="text-3xl font-bold text-center mb-12 text-glow">第二部分: 零信任内核架构蓝图</h3>
+
+            <div class="card p-6 rounded-lg mb-8">
+                <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">2.1 信任链原则：建立不可动摇的基石</h4>
+                <div class="text-center">
+                    <div class="inline-block p-4 bg-[#0F1A13] rounded-lg">
+                        <p class="text-5xl">⚓</p>
+                        <p class="font-bold text-lg mt-2">硬件信任根 (TPM 2.0)</p>
+                    </div>
+                    <div class="text-4xl text-gray-500 font-light my-2">↓</div>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-2 text-center">
+                        <div class="p-3 bg-green-800 rounded-lg w-48">安全启动 (UKI)</div>
+                        <div class="text-2xl text-gray-500 mx-2">→</div>
+                        <div class="p-3 bg-green-700 rounded-lg w-48">内核空间</div>
+                        <div class="text-2xl text-gray-500 mx-2">→</div>
+                        <div class="p-3 bg-green-600 rounded-lg w-48">运行时软件</div>
+                    </div>
+                </div>
+                <p class="text-center mt-6 text-gray-300">一个安全的系统必须建立在一条信任链之上，其起点是物理上不可更改的硬件信任根。海姆达尔计划的核心就是将这条链延伸至系统的每一个角落。</p>
+            </div>
+
+            <div class="card p-6 rounded-lg mb-8">
+                <h4 class="text-2xl font-bold text-center text-[#00A859] mb-6">2.2 可验证完整性的四大支柱</h4>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="text-center p-4 bg-[#0F1A13] rounded-lg">
+                        <p class="text-4xl">🕵️</p>
+                        <h5 class="font-bold mt-2">IMA</h5>
+                        <p class="text-xs text-gray-400 mb-2">运行时哨兵</p>
+                        <p class="text-sm">评估文件<span class="font-bold text-green-400">内容</span>是否被篡改。</p>
+                    </div>
+                    <div class="text-center p-4 bg-[#0F1A13] rounded-lg">
+                        <p class="text-4xl">🔗</p>
+                        <h5 class="font-bold mt-2">EVM</h5>
+                        <p class="text-xs text-gray-400 mb-2">离线防御者</p>
+                        <p class="text-sm">保护文件<span class="font-bold text-yellow-400">元数据</span>（包括IMA哈希）不被伪造。</p>
+                    </div>
+                    <div class="text-center p-4 bg-[#0F1A13] rounded-lg">
+                        <p class="text-4xl">🛡️</p>
+                        <h5 class="font-bold mt-2">TPM 2.0</h5>
+                        <p class="text-xs text-gray-400 mb-2">硬件锚点</p>
+                        <p class="text-sm">提供防篡改的<span class="font-bold text-blue-400">密钥存储</span>与<span class="font-bold text-blue-400">测量日志</span>。</p>
+                    </div>
+                    <div class="text-center p-4 bg-[#0F1A13] rounded-lg">
+                        <p class="text-4xl">📦</p>
+                        <h5 class="font-bold mt-2">UKI</h5>
+                        <p class="text-xs text-gray-400 mb-2">原子化启动</p>
+                        <p class="text-sm">将<span class="font-bold text-purple-400">安全策略</span>与内核一同签名，防止绕过。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-8 rounded-lg">
+                <h4 class="text-2xl font-bold text-center text-[#00A859] mb-6">2.3 协同作战：一个统一的防御体系</h4>
+                <div class="border-2 border-dashed border-[#005A34] p-6 rounded-lg">
+                    <div class="text-center mb-6">
+                        <p class="font-bold text-lg">场景: 用户执行 <code class="bg-black/50 px-2 py-1 rounded">sudo ls</code></p>
+                    </div>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🚀 启动时: 信任锚定</h5>
+                            <p class="text-xs">TPM检查<span class="text-blue-400 font-bold">PCR7</span>值，确认安全启动状态后，解封EVM密钥。</p>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🔑 第1步: EVM验证元数据</h5>
+                            <p class="text-xs">内核使用解封的密钥，验证<span class="text-yellow-400 font-bold">EVM签名</span>。此举确保文件的IMA哈希值本身是可信的。</p>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🕵️ 第2步: IMA评估文件内容</h5>
+                            <p class="text-xs">内核计算文件实时哈希，并与可信的<span class="text-green-400 font-bold">IMA哈希</span>对比。</p>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="flex gap-4 mt-4">
+                            <div class="p-4 rounded-lg text-center bg-green-900/50 border border-green-500 flex-1">
+                                <p class="text-xl font-bold text-green-400">✅ 全部通过</p>
+                                <p class="text-sm">允许执行</p>
+                            </div>
+                            <div class="p-4 rounded-lg text-center bg-red-900/50 border border-red-500 flex-1">
+                                <p class="text-xl font-bold text-red-400">❌ 任何一步失败</p>
+                                <p class="text-sm">拒绝访问</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part3" class="mb-20 pt-16 -mt-16">
+            <h3 class="text-3xl font-bold text-center mb-12 text-glow">第三部分: 实施案例研究</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-xl font-bold text-center text-[#00A859] mb-4">3.1 定制核心：铸造安全基石</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-4 mt-4">
+                        <div class="flex-1">
+                            <p class="text-3xl">⚙️</p>
+                            <p class="font-bold text-sm">起点: 通用内核</p>
+                            <p class="text-xs text-gray-400">功能丰富但攻击面大</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🛡️</p>
+                            <p class="font-bold text-sm">加固</p>
+                            <p class="text-xs text-gray-400">移除非必需模块</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🚦</p>
+                            <p class="font-bold text-sm">开启</p>
+                            <p class="text-xs text-gray-400">激活IMA/EVM/TPM</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">💎</p>
+                            <p class="font-bold text-sm">终点: 强化核心</p>
+                            <p class="text-xs text-gray-400">精简、坚固、安全</p>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-4 text-center">此流程遵循“最小权限”原则，通过加固和开启安全模块，将通用内核重塑为一个专为安全而生的、最小化的可信计算基。</p>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-xl font-bold text-center text-[#00A859] mb-4">3.2 分层密钥管理策略</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-4 mt-4">
+                        <div class="flex-1">
+                            <p class="text-3xl">🏛️</p>
+                            <p class="font-bold text-sm">1. 创建根信任</p>
+                            <p class="text-xs text-gray-400">建立离线IMA根CA</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">✍️</p>
+                            <p class="font-bold text-sm">2. 签发工作密钥</p>
+                            <p class="text-xs text-gray-400">用于日常文件签名</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🧠</p>
+                            <p class="font-bold text-sm">3. 嵌入内核</p>
+                            <p class="text-xs text-gray-400">将根CA公钥编译进去</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🛡️</p>
+                            <p class="font-bold text-sm">4. 硬件密封</p>
+                            <p class="text-xs text-gray-400">用TPM密封EVM密钥</p>
+                        </div>
+                    </div>
+                     <p class="text-xs mt-4 text-center">此策略将软件层面的信任（IMA CA）与硬件锚定的信任（EVM密钥）分离又结合，构建了一个既灵活又坚固的加密骨干。</p>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-xl font-bold text-center text-[#00A859] mb-4">3.3 分阶段部署策略</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-4 mt-4">
+                         <div class="flex-1">
+                            <p class="text-3xl">🧐</p>
+                            <p class="font-bold text-sm">1. 审计模式</p>
+                            <p class="text-xs text-gray-400">ima_appraise=log</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🏷️</p>
+                            <p class="font-bold text-sm">2. 修复与标记</p>
+                            <p class="text-xs text-gray-400">ima_appraise=fix</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">✅</p>
+                            <p class="font-bold text-sm">3. 验证基线</p>
+                            <p class="text-xs text-gray-400">检查日志确保无误</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🚦</p>
+                            <p class="font-bold text-sm">4. 强制执行</p>
+                            <p class="text-xs text-gray-400">ima_appraise=enforce</p>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-4 text-center">这种渐进式方法确保了从宽松到严格的安全策略过渡是平滑且可控的，最大限度地减少了对生产环境的冲击。</p>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-xl font-bold text-center text-[#00A859] mb-4">3.4 不可变启动：固化安全策略</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-4 mt-4">
+                        <div class="flex-1">
+                            <p class="text-2xl">📦</p><p class="font-bold text-sm">1. 打包</p>
+                            <p class="text-xs mt-1 text-gray-400">内核+安全策略+Initrd</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-2xl">✍️</p><p class="font-bold text-sm">2. 签名</p>
+                            <p class="text-xs mt-1 text-gray-400">使用安全启动密钥</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-2xl">🚀</p><p class="font-bold text-sm">3. 加载</p>
+                            <p class="text-xs mt-1 text-gray-400">引导加载程序加载</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-2xl">🛡️</p><p class="font-bold text-sm">4. 验证</p>
+                            <p class="text-xs mt-1 text-gray-400">UEFI固件验证签名</p>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-4 text-center">此流程将安全策略本身变成一个受硬件保护的加密对象，彻底关闭了通过修改引导参数来绕过安全机制的后门。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="part4" class="mb-20 pt-16 -mt-16">
+            <h3 class="text-3xl font-bold text-center mb-12 text-glow">第四部分: 实证验证与安全分析</h3>
+             <div class="grid md:grid-cols-2 gap-8">
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">4.1 场景一：运行时攻击</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-4 mt-4">
+                        <div class="flex-1">
+                            <p class="text-3xl">✅</p>
+                            <p class="font-bold text-sm">1. 初始状态</p>
+                            <p class="text-xs text-gray-400">/usr/bin/ls 文件受IMA保护</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">✍️</p>
+                            <p class="font-bold text-sm">2. 攻击行为</p>
+                            <p class="text-xs text-gray-400">攻击者篡改文件内容</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🚫</p>
+                            <p class="font-bold text-sm">3. 执行尝试</p>
+                            <p class="text-xs text-gray-400">用户或系统尝试运行</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🛡️</p>
+                            <p class="font-bold text-sm">4. IMA 拦截</p>
+                            <p class="text-xs text-gray-400">哈希不匹配，访问被拒绝</p>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-4 text-center">此演示证明IMA评估机制能有效阻止对受保护文件的任何运行时篡改，确保了可执行文件的完整性。</p>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">4.2 场景二：离线攻击</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-4 mt-4">
+                        <div class="flex-1">
+                            <p class="text-3xl">👻</p>
+                            <p class="font-bold text-sm">1. 离线篡改</p>
+                            <p class="text-xs text-gray-400">攻击者修改/bin/sudo</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">📝</p>
+                            <p class="font-bold text-sm">2. 伪造哈希</p>
+                            <p class="text-xs text-gray-400">攻击者更新security.ima</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🔑</p>
+                            <p class="font-bold text-sm">3. 攻击失败点</p>
+                            <p class="text-xs text-gray-400">无法伪造EVM签名(密钥被TPM密封)</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">🛡️</p>
+                            <p class="font-bold text-sm">4. EVM 防御</p>
+                            <p class="text-xs text-gray-400">开机后EVM检测到签名无效</p>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-4 text-center">此分析证明了EVM与TPM的协同作用是防御离线攻击的关键，它保护了信任链中最脆弱的一环——元数据。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="part5" class="mb-20 pt-16 -mt-16">
+            <h3 class="text-3xl font-bold text-center mb-12 text-glow">第五部分: 战略价值与应用前景</h3>
+             <div class="space-y-8">
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">5.1 内核级零信任架构</h4>
+                    <div class="flex flex-col items-center text-center gap-4 mt-4">
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🤔 原则一: 从不信任，永远验证</h5>
+                            <p class="text-xs text-gray-400">系统不再假定内部文件可信，每次访问都需实时验证。</p>
+                        </div>
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🏰 原则二: 假设泄露</h5>
+                            <p class="text-xs text-gray-400">防御内置于系统底层，而非依赖脆弱的边界。</p>
+                        </div>
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">👮 原则三: 最小权限</h5>
+                            <p class="text-xs text-gray-400">即便是root也无法执行被篡改的代码，限制破坏范围。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">5.2 赋能远程证明</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-4 mt-4">
+                        <div class="flex-1">
+                            <p class="text-3xl">❓</p>
+                            <p class="font-bold text-sm">1. 挑战</p>
+                            <p class="text-xs text-gray-400">验证者发送随机数</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">✍️</p>
+                            <p class="font-bold text-sm">2. 引用</p>
+                            <p class="text-xs text-gray-400">TPM对PCR和随机数签名</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">📨</p>
+                            <p class="font-bold text-sm">3. 响应</p>
+                            <p class="text-xs text-gray-400">发送引用和IMA日志</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-3xl">✅</p>
+                            <p class="font-bold text-sm">4. 验证</p>
+                            <p class="text-xs text-gray-400">验证者重放日志并比对</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">5.3 在高风险环境中的应用</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center items-start gap-6 mt-4">
+                        <div class="flex-1">
+                            <p class="text-4xl">☁️</p>
+                            <p class="font-bold text-sm mt-2">云计算</p>
+                            <p class="text-xs text-gray-400">确保VM镜像完整性，为客户提供可信证明。</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-4xl">🏭</p>
+                            <p class="font-bold text-sm mt-2">关键基础设施</p>
+                            <p class="text-xs text-gray-400">锁定工控系统软件，防止未经授权的变更。</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-4xl">🛰️</p>
+                            <p class="font-bold text-sm mt-2">物联网 (IoT)</p>
+                            <p class="text-xs text-gray-400">保证海量设备固件安全，实现可信远程管理。</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-4xl">💳</p>
+                            <p class="font-bold text-sm mt-2">金融服务</p>
+                            <p class="text-xs text-gray-400">保护交易软件，提供不可变的审计追踪。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part6" class="mb-20 pt-16 -mt-16">
+            <h3 class="text-3xl font-bold text-center mb-12 text-glow">第六部分: 结论与展望</h3>
+             <div class="space-y-8">
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">6.1 成果总结</h4>
+                    <div class="flex flex-col items-center text-center gap-4 mt-4">
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🔗 端到端信任链</h5>
+                            <p class="text-xs text-gray-400">成功构建了从硬件加电到应用程序运行的、完整且可验证的信任链。</p>
+                        </div>
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🛡️ 深度防御</h5>
+                            <p class="text-xs text-gray-400">有效抵御了包括运行时代码注入和离线物理篡改在内的多种高级威胁。</p>
+                        </div>
+                        <div class="card p-4 rounded-lg w-full md:w-4/5">
+                            <h5 class="font-bold text-lg text-[#6BDBAD]">🎯 零信任落地</h5>
+                            <p class="text-xs text-gray-400">将零信任安全理念在操作系统核心层面进行了切实的工程化落地。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold text-center text-[#00A859] mb-4">6.2 未来展望</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 text-center items-start gap-6 mt-4">
+                        <div class="flex-1">
+                            <p class="text-4xl">📡</p>
+                            <p class="font-bold text-sm mt-2">集成远程证明</p>
+                            <p class="text-xs text-gray-400">与Keylime等验证器集成，实现自动化信任监控。</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-4xl">🔬</p>
+                            <p class="font-bold text-sm mt-2">细粒度策略</p>
+                            <p class="text-xs text-gray-400">为特定应用（如数据库）定制更精确的保护策略。</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-4xl">⏱️</p>
+                            <p class="font-bold text-sm mt-2">性能基准测试</p>
+                            <p class="text-xs text-gray-400">量化不同策略对系统性能的影响，指导部署。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+
+        const chartColors = {
+            accentGreen: '#00A859',
+            lightGreen: '#6BDBAD',
+            red: '#E53E3E',
+            statusGreen: '#48BB78',
+            darkGreen: '#005A34'
+        };
+
+        // Note: zeroTrustChart canvas is removed, so its JS is also removed.
+
+    </script>
+
+</body>
+</html>
