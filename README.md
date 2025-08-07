@@ -10,8 +10,8 @@
 </div>
 
 <div align="center">
-<a href="https://github.com/auveggry/Linux-Heimdall" target="_blank">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/GitHub-%E6%9F%A5%E7%9C%8B%E9%A1%B9%E7%9B%AE-00A859%3Fstyle%3Dfor-the-badge%26logo%3Dgithub" alt="在 GitHub 上查看">
+<a href="https://sakurame.eu.org/2025/08/07/privacy/%E4%B8%80%E4%B8%AA%E5%BC%80%E6%BA%90%E7%9A%84Linux%E5%86%85%E6%A0%B8%E5%AE%89%E5%85%A8%E5%BC%BA%E5%8C%96%E9%A1%B9%E7%9B%AE/" target="_blank">
+<img src="https://img.shields.io/badge/博客-阅读全文-00A859?style=for-the-badge&logo=blogger" alt="在博客上查看">
 </a>
 </div>
 
@@ -188,31 +188,31 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <table width="100%">
 <tbody>
 <tr>
-<td colspan="4">
+<td width="50%" valign="top">
 <h4 align="center">5.1 内核级零信任架构</h4>
 <ul>
-<li><b>🤔 从不信任，永远验证:</b> 系统不再假定内部文件可信，每次访问都需实时验证。</li>
-<li><b>🏰 假设泄露:</b> 防御内置于系统底层，而非依赖脆弱的边界。</li>
-<li><b>👮 最小权限:</b> 即便是root也无法执行被篡改的代码，限制破坏范围。</li>
+<li><b>🤔 从不信任，永远验证:</b><br><small>系统不再假定内部文件可信，每次访问都需实时验证。</small></li>
+<li><b>🏰 假设泄露:</b><br><small>防御内置于系统底层，而非依赖脆弱的边界。</small></li>
+<li><b>👮 最小权限:</b><br><small>即便是root也无法执行被篡改的代码，限制破坏范围。</small></li>
 </ul>
-</td>
-</tr>
-<tr>
-<td colspan="4">
 <h4 align="center">5.2 赋能远程证明</h4>
 <p align="center">❓ → ✍️ → 📨 → ✅<br><small>挑战 → 引用 → 响应 → 验证</small></p>
 </td>
-</tr>
-<tr>
-<td colspan="4">
+<td width="50%" valign="top">
 <h4 align="center">5.3 在高风险环境中的应用</h4>
-</td>
+<table width="100%">
+<tbody>
+<tr>
+<td align="center">☁️<br><b>云计算</b><br><small>确保VM镜像完整性</small></td>
+<td align="center">🏭<br><b>关键基础设施</b><br><small>锁定工控系统软件</small></td>
 </tr>
 <tr>
-<td width="25%" align="center">☁️<br><b>云计算</b><br><small>确保VM镜像完整性</small></td>
-<td width="25%" align="center">🏭<br><b>关键基础设施</b><br><small>锁定工控系统软件</small></td>
-<td width="25%" align="center">🛰️<br><b>物联网 (IoT)</b><br><small>保证海量设备固件安全</small></td>
-<td width="25%" align="center">💳<br><b>金融服务</b><br><small>保护交易软件</small></td>
+<td align="center">🛰️<br><b>物联网 (IoT)</b><br><small>保证海量设备固件安全</small></td>
+<td align="center">💳<br><b>金融服务</b><br><small>保护交易软件</small></td>
+</tr>
+</tbody>
+</table>
+</td>
 </tr>
 </tbody>
 </table>
