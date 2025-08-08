@@ -5,286 +5,279 @@ Linux Heimdall (海姆达尔计划)
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
 <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
 <img src="https://img.shields.io/badge/Linux%20Kernel-6.x-orange" alt="Kernel Version">
-<img src="https://img.shields.io/github/stars/auveggry/Linux-Heimdall?style=social" alt="GitHub stars">
+<img src="https://img.shields.io/github/stars/auveggry/Linux-Heimdall" alt="GitHub stars">
 </p>
 
 一个基于 IMA/EVM + TPM 2.0 + UKI 的开源 Linux 内核安全强化架构，旨在构建从硬件到运行时的端到端可验证信任链。
 
 <br>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Nils_Asplund_-_Heimdal.jpg" alt="Heimdall Art" width="700"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Nils_Asplund_-_Heimdal.jpg" alt="Heimdall Art" width="800"/>
 
-<em style="color: #9CA3AF;">项目命名缘由：在北欧神话中，守护神海姆达尔以其超凡的感知力和警惕性著称。本项目借其之名，旨在强调其核心使命——为Linux内核构建一个不知疲倦、洞察秋毫、且反应迅速的终极守护者。</em>
+<br>
+
+<div style="max-width: 48rem; margin: 0 auto;">
+<h3 style="font-size: 1.25rem; font-weight: bold; color: #6BDBAD;">项目命名缘由：神话与技术的交汇</h3>
+<p style="font-size: 0.875rem; margin-top: 0.5rem; color: #9CA3AF;">在北欧神话中，守护神海姆达尔以其超凡的感知力和警惕性著称。本项目借其之名，旨在强调其核心使命：为Linux内核构建一个不知疲倦、洞察秋毫、且反应迅速的终极守护者。</p>
 </div>
 
-<!-- Section-based Navigation -->
+</div>
 
+<div align="center" style="max-width: 1100px; margin: 2rem auto; background: #1B2D24; border: 1px solid #005A34; border-radius: 12px; padding: 8px;">
+<a href="#-第一部分-完整性缺口分析" style="color: #E5E7EB; text-decoration: none; padding: 8px 12px; border-radius: 8px;">缺口分析</a>
+<a href="#-第二部分-零信任内核架构蓝图" style="color: #E5E7EB; text-decoration: none; padding: 8px 12px; border-radius: 8px;">架构蓝图</a>
+<a href="#-第三部分-实施案例研究" style="color: #E5E7EB; text-decoration: none; padding: 8px 12px; border-radius: 8px;">实施研究</a>
+<a href="#-第四部分-实证验证与安全分析" style="color: #E5E7EB; text-decoration: none; padding: 8px 12px; border-radius: 8px;">实证验证</a>
+<a href="#-第五部分-战略价值与应用前景" style="color: #E5E7EB; text-decoration: none; padding: 8px 12px; border-radius: 8px;">战略价值</a>
+<a href="#-第六部分-结论与展望" style="color: #E5E7EB; text-decoration: none; padding: 8px 12px; border-radius: 8px;">结论展望</a>
+</div>
+
+<div align="center" style="color: white; text-shadow: 0 0 8px rgba(0, 168, 89, 0.8);">🛡️ 第一部分: 完整性缺口分析</div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1.5rem;">1.1 安全启动的幻象：信任链的断裂点</h4>
 <table width="100%">
-<tr align="center">
-<td><a href="#-第一部分-完整性缺口分析">缺口分析</a></td>
-<td><a href="#-第二部分-零信任内核架构蓝图">架构蓝图</a></td>
-<td><a href="#-第三部分-实施案例研究">实施研究</a></td>
-<td><a href="#-第四部分-实证验证与安全分析">实证验证</a></td>
-<td><a href="#-第五部分-战略价值与应用前景">战略价值</a></td>
-<td><a href="#-第六部分-结论与展望">结论展望</a></td>
-</tr>
-</table>
-
-<a id="-第一部分-完整性缺口分析">🛡️ 第一部分: 完整性缺口分析</a>
-1.1 安全启动的幻象：信任链的断裂点
-<table>
 <tr>
-<td width="45%" valign="top">
-<div align="center">
-<br>
-<div style="background-color: #166534; color: white; border-radius: 8px; padding: 10px; width: 200px; text-align: center; font-weight: bold;">UEFI Firmware</div>
-<div style="color: #007A42; font-size: 24px; font-weight: bold;">↓</div>
-<div style="background-color: #166534; color: white; border-radius: 8px; padding: 10px; width: 200px; text-align: center; font-weight: bold;">Bootloader</div>
-<div style="color: #007A42; font-size: 24px; font-weight: bold;">↓</div>
-<div style="background-color: #166534; color: white; border-radius: 8px; padding: 10px; width: 200px; text-align: center; font-weight: bold;">Kernel Loaded</div>
-<div style="color: #DC2626; font-size: 24px; font-weight: bold;">⚡️</div>
-<div style="background-color: #991B1B; color: white; border-radius: 8px; padding: 10px; width: 200px; text-align: center; font-weight: bold;">Runtime Vulnerable</div>
-<br>
+<td width="50%" align="center" style="vertical-align: top;">
+<div style="padding: 0.75rem; background-color: #166534; border-radius: 8px; width: 14rem; text-align: center; font-weight: bold;">UEFI Firmware</div>
+<div style="width: 2px; height: 2rem; background-color: #007A42; margin: auto;"></div>
+<div style="padding: 0.75rem; background-color: #166534; border-radius: 8px; width: 14rem; text-align: center; font-weight: bold;">Bootloader</div>
+<div style="width: 2px; height: 2rem; background-color: #007A42; margin: auto;"></div>
+<div style="padding: 0.75rem; background-color: #166534; border-radius: 8px; width: 14rem; text-align: center; font-weight: bold;">Kernel Loaded</div>
+<div style="width: 14rem; display: flex; align-items: center; justify-content: center; margin: 0.75rem auto;">
+<div style="flex-grow: 1; height: 1px; background-color: #DC2626;"></div>
+<span style="font-size: 1.875rem; color: #DC2626; background-color: #1B2D24; padding: 0 0.5rem;">⚡️</span>
+<div style="flex-grow: 1; height: 1px; background-color: #DC2626;"></div>
 </div>
+<div style="padding: 0.75rem; background-color: #991B1B; border-radius: 8px; width: 14rem; text-align: center; font-weight: bold;">Runtime Vulnerable</div>
 </td>
-<td valign="top">
-<ul>
-<li>
-<p>🛡️ <strong><font color="#4ADE80">阶段一：启动时验证</font></strong><br>
-<small style="color: #9CA3AF;">UEFI固件验证引导加载器和内核的签名，确保启动过程的初始纯洁性。</small></p>
-</li>
-<li>
-<p>🏁 <strong><font color="#FBBF24">阶段二：信任交接</font></strong><br>
-<small style="color: #9CA3AF;">内核成功加载后，安全启动的使命完成。信任链在此刻交接，但传统上并未延续。</small></p>
-</li>
-<li>
-<p>🚨 <strong><font color="#F87171">阶段三：运行时风险暴露</font></strong><br>
-<small style="color: #9CA3AF;">所有用户空间的应用、库和配置文件都处于无监控状态，为攻击者留下了广阔的攻击面。</small></p>
-</li>
+<td width="50%" style="vertical-align: middle;">
+<ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1.5rem;">
+<li style="display: flex; align-items: flex-start;"><span style="font-size: 1.875rem; margin-right: 1rem; line-height: 1;">🛡️</span><div><h5 style="font-weight: bold; color: #4ADE80; margin:0;">阶段一：启动时验证</h5><p style="font-size: 0.875rem; color: #9CA3AF; margin:0;">UEFI固件验证引导加载器和内核的签名，确保启动过程的初始纯洁性。</p></div></li>
+<li style="display: flex; align-items: flex-start;"><span style="font-size: 1.875rem; margin-right: 1rem; line-height: 1;">🏁</span><div><h5 style="font-weight: bold; color: #FBBF24; margin:0;">阶段二：信任交接</h5><p style="font-size: 0.875rem; color: #9CA3AF; margin:0;">内核成功加载后，安全启动的使命完成。信任链在此刻交接，但传统上并未延续。</p></div></li>
+<li style="display: flex; align-items: flex-start;"><span style="font-size: 1.875rem; margin-right: 1rem; line-height: 1;">🚨</span><div><h5 style="font-weight: bold; color: #F87171; margin:0;">阶段三：运行时风险暴露</h5><p style="font-size: 0.875rem; color: #9CA3AF; margin:0;">所有用户空间的应用、库和配置文件都处于无监控状态，为攻击者留下了广阔的攻击面。</p></div></li>
 </ul>
 </td>
 </tr>
 </table>
-
-1.2 运行时威胁 & 1.3 离线威胁
-<table>
-<tr>
-<td width="50%" valign="top">
-<h4 align="center"><font color="#00A859">1.2 运行时威胁：系统内部的背叛</font></h4>
-<table width="100%">
-<tr align="center">
-<td><strong><font color="#4ADE80">事前: 合法执行</font></strong><br>💻<br><code>/bin/sudo</code><br><small>内核验证路径和权限</small><br>✅</td>
-<td><br>🦠<br>→<br><small><font color="#F87171">恶意注入</font></small></td>
-<td><strong><font color="#F87171">事后: 恶意行为</font></strong><br>💀<br><code>/bin/sudo</code><br><small>内容已被篡改</small><br>🔓</td>
-</tr>
-</table>
-<blockquote>
-<p>🚨 <strong>关键漏洞：内核的盲点</strong><br>
-<small>传统内核在执行文件时，信任的是文件的<strong>路径</strong>而非<strong>内容</strong>。它检查用户是否有权限执行 <code>/bin/sudo</code>，但它无法感知到该路径指向的文件内容已被恶意替换。这是运行时完整性保护的核心动机。</small></p>
-</blockquote>
-</td>
-<td width="50%" valign="top">
-<h4 align="center"><font color="#00A859">1.3 离线威胁：“邪恶女仆”攻击</font></h4>
-<div align="center">
-<p>👻 物理接触 → 💾 离线挂载 → 📝 篡改文件</p>
-</div>
-<blockquote>
-<p>🚨 <strong>关键漏洞：仅有IMA的系统为何会失效？</strong><br>
-<small>攻击者不仅修改了文件内容，还利用离线权限，重新计算并覆盖了文件的“合法”哈希值。</small>
-<pre><code style="color: #F87171;"># 1. echo 'malware' > /bin/sudo
-
-2. new_hash=$(sha256sum /bin/sudo)
-3. setfattr -n security.ima -v $new_hash /bin/sudo
-</code></pre>
-<small><font color="#FCD34D">当系统重启后，IMA会发现哈希匹配，从而错误地信任了被篡改的文件！</font></small></p>
-</blockquote>
-</td>
-</tr>
-</table>
-
-<a id="-第二部分-零信任内核架构蓝图">🗺️ 第二部分: 零信任内核架构蓝图</a>
-2.1 信任链原则：建立不可动摇的基石
-<div align="center">
-<p>⚓<br><strong>硬件信任根 (TPM 2.0)</strong></p>
-<p>↓</p>
-<p><strong>安全启动 (UKI)</strong> → <strong>内核空间 (IMA/EVM)</strong> → <strong>运行时软件</strong></p>
-<p><small style="color: #9CA3AF;">一个安全的系统必须建立在一条信任链之上，其起点是物理上不可更改的硬件信任根。<br>海姆达尔计划的核心就是将这条链延伸至系统的每一个角落。</small></p>
 </div>
 
-2.2 可验证完整性的四大支柱
-<table width="100%">
-<tr align="center">
-<td width="25%">🕵️<br><strong>IMA</strong><br><small>运行时哨兵</small><hr><small>评估文件<font color="#4ADE80"><strong>内容</strong></font>是否被篡改。</small></td>
-<td width="25%">🔗<br><strong>EVM</strong><br><small>离线防御者</small><hr><small>保护文件<font color="#FBBF24"><strong>元数据</strong></font>不被伪造。</small></td>
-<td width="25%">🛡️<br><strong>TPM 2.0</strong><br><small>硬件锚点</small><hr><small>提供防篡改的<font color="#60A5FA"><strong>密钥存储</strong></font>与<font color="#60A5FA"><strong>测量日志</strong></font>。</small></td>
-<td width="25%">📦<br><strong>UKI</strong><br><small>原子化启动</small><hr><small>将<font color="#A78BFA"><strong>安全策略</strong></font>与内核一同签名，防止绕过。</small></td>
+<table width="100%" style="border-spacing: 2rem; border-collapse: separate;">
+<tr>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top: 0;">1.2 运行时威胁：系统内部的背叛</h4>
+<table width="100%" style="text-align: center;">
+<tr>
+<td style="vertical-align: top;"><h5 style="font-weight: bold; color: #4ADE80;">事前: 合法执行</h5><p style="font-size: 2.25rem; margin: 0.5rem 0;">💻</p><p style="font-family: monospace; font-size: 0.75rem; background-color: #374151; padding: 0.25rem; border-radius: 4px; display: inline-block;">/bin/sudo</p><p style="font-size: 0.75rem; margin-top: 0.25rem;">内核验证路径和权限</p><p style="font-size: 1.5rem; margin-top: 0.5rem; color: #4ADE80;">✅</p></td>
+<td style="vertical-align: middle;">
+<div style="font-size: 2.25rem; color: #F87171;">→</div>
+<p style="font-size: 2.25rem; margin:0.5rem 0;">🦠</p>
+<p style="font-size: 0.75rem; color: #F87171;">恶意软件注入</p>
+</td>
+<td style="vertical-align: top;"><h5 style="font-weight: bold; color: #F87171;">事后: 恶意行为</h5><p style="font-size: 2.25rem; margin: 0.5rem 0;">💀</p><p style="font-family: monospace; font-size: 0.75rem; background-color: rgba(153, 27, 27, 0.8); padding: 0.25rem; border-radius: 4px; display: inline-block;">/bin/sudo</p><p style="font-size: 0.75rem; margin-top: 0.25rem;">内容已被篡改</p><p style="font-size: 1.5rem; margin-top: 0.5rem; color: #F87171;">🔓</p></td>
+</tr>
+</table>
+<div style="width: 100%; text-align: center; font-size: 1.5rem; margin: 0.75rem 0; color: #F87171;">↓</div>
+<h5 style="font-weight: bold; color: #F87171; text-align: center; margin-bottom: 0.5rem;">关键漏洞：内核的盲点</h5>
+<div style="background-color: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px; border: 1px solid #F87171; text-align: center;"><p style="font-size: 0.875rem; margin:0;">传统内核在执行文件时，信任的是文件的<b>路径</b>而非<b>内容</b>。它检查用户是否有权限执行<code>/bin/sudo</code>，但它无法感知到该路径指向的文件内容已被恶意替换。这是运行时完整性保护的核心动机。</p></div>
+</td>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top: 0;">1.3 离线威胁：“邪恶女仆”攻击</h4>
+<h5 style="font-weight: bold; color: #FBBF24; text-align: center; margin-bottom: 0.5rem;">攻击者路径</h5>
+<table width="100%" style="text-align: center;">
+<tr>
+<td><p style="font-size: 1.875rem; margin:0;">👻</p><p style="margin:0; font-size: 0.875rem;">物理接触</p></td>
+<td><div style="font-size: 1.5rem; color: #6B7280;">→</div></td>
+<td><p style="font-size: 1.875rem; margin:0;">💾</p><p style="margin:0; font-size: 0.875rem;">离线挂载</p></td>
+<td><div style="font-size: 1.5rem; color: #6B7280;">→</div></td>
+<td><p style="font-size: 1.875rem; margin:0;">📝</p><p style="margin:0; font-size: 0.875rem;">篡改文件</p></td>
+</tr>
+</table>
+<div style="width: 100%; text-align: center; font-size: 1.5rem; margin: 0.75rem 0; color: #F87171;">↓</div>
+<h5 style="font-weight: bold; color: #F87171; text-align: center; margin-bottom: 0.5rem;">关键漏洞：仅有IMA的系统为何会失效？</h5>
+<div style="background-color: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px; border: 1px solid #F87171;">
+<p style="font-size: 0.875rem; margin-bottom: 0.5rem; margin-top: 0;">攻击者不仅修改了文件内容，还利用离线权限，重新计算并覆盖了文件的“合法”哈希值。</p>
+<div style="font-family: monospace; font-size: 0.75rem; color: #F87171; background: #111; padding: 10px; border-radius: 5px;">
+<p style="margin:0;">1. # echo 'malware' > /bin/sudo</p>
+<p style="margin:0;">2. # new_hash=$(sha256sum /bin/sudo)</p>
+<p style="margin:0;">3. # setfattr -n security.ima -v $new_hash /bin/sudo</p>
+</div>
+<p style="font-size: 0.875rem; margin-top: 0.5rem; text-align: center; color: #FCD34D;">当系统重启后，IMA会发现哈希匹配，从而错误地信任了被篡改的文件！</p>
+</div>
+</td>
 </tr>
 </table>
 
-2.3 协同作战：一个统一的防御体系
-<div align="center">
-<p><strong>场景: 用户执行 <code>sudo ls</code></strong></p>
+<div align="center" style="color: white; text-shadow: 0 0 8px rgba(0, 168, 89, 0.8);">🗺️ 第二部分: 零信任内核架构蓝图</div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem;">2.1 信任链原则：建立不可动摇的基石</h4>
+<div style="text-align: center;">
+<div style="display: inline-block; padding: 1rem; background-color: #0F1A13; border-radius: 8px;">
+<p style="font-size: 3rem; margin: 0;">⚓</p>
+<p style="font-weight: bold; font-size: 1.125rem; margin-top: 0.5rem;">硬件信任根 (TPM 2.0)</p>
+</div>
+<div style="font-size: 2.25rem; color: #6B7280; font-weight: 200; margin: 0.5rem 0;">↓</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; text-align: center;">
+<div style="padding: 0.75rem; background-color: #166534; border-radius: 8px; width: 12rem;">安全启动 (UKI)</div>
+<div style="font-size: 1.5rem; color: #6B7280; margin: 0 0.5rem;">→</div>
+<div style="padding: 0.75rem; background-color: #15803D; border-radius: 8px; width: 12rem;">内核空间</div>
+<div style="font-size: 1.5rem; color: #6B7280; margin: 0 0.5rem;">→</div>
+<div style="padding: 0.75rem; background-color: #16A34A; border-radius: 8px; width: 12rem;">运行时软件</div>
+</div>
+</div>
+<p style="text-align: center; margin-top: 1.5rem; color: #D1D5DB;">一个安全的系统必须建立在一条信任链之上，其起点是物理上不可更改的硬件信任根。海姆达尔计划的核心就是将这条链延伸至系统的每一个角落。</p>
 </div>
 
-🚀 启动时: 信任锚定<br>
-<small>TPM检查<font color="#60A5FA"><strong>PCR7</strong></font>值，确认安全启动状态后，解封EVM密钥。</small>
-
-<div align="center">↓</div>
-
-🔑 第1步: EVM验证元数据<br>
-<small>内核使用解封的密钥，验证<font color="#FBBF24"><strong>EVM签名</strong></font>。此举确保文件的IMA哈希值本身是可信的。</small>
-
-<div align="center">↓</div>
-
-🕵️ 第2步: IMA评估文件内容<br>
-<small>内核计算文件实时哈希，并与可信的<font color="#4ADE80"><strong>IMA哈希</strong></font>对比。</small>
-
-<div align="center">↓</div>
-
-<table width="100%">
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1.5rem;">2.2 可验证完整性的四大支柱</h4>
+<table width="100%" style="border-spacing: 1.5rem; border-collapse: separate; text-align: center;">
 <tr>
-<td align="center" width="50%" style="background-color: rgba(22, 101, 52, 0.2); border: 1px solid #22C55E; border-radius: 8px;">
-<p><strong><font color="#4ADE80">✅ 全部通过</font></strong><br><small>允许执行</small></p>
-</td>
-<td align="center" width="50%" style="background-color: rgba(153, 27, 27, 0.2); border: 1px solid #EF4444; border-radius: 8px;">
-<p><strong><font color="#F87171">❌ 任何一步失败</font></strong><br><small>拒绝访问</small></p>
-</td>
+<td style="width: 25%; background-color: #0F1A13; border-radius: 8px; padding: 1rem; vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">🕵️</p><h5 style="font-weight: bold; margin-top: 0.5rem;">IMA</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin-bottom: 0.5rem;">运行时哨兵</p><p style="font-size: 0.875rem;">评估文件<strong style="color: #4ADE80;">内容</strong>是否被篡改。</p></td>
+<td style="width: 25%; background-color: #0F1A13; border-radius: 8px; padding: 1rem; vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">🔗</p><h5 style="font-weight: bold; margin-top: 0.5rem;">EVM</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin-bottom: 0.5rem;">离线防御者</p><p style="font-size: 0.875rem;">保护文件<strong style="color: #FBBF24;">元数据</strong>（包括IMA哈希）不被伪造。</p></td>
+<td style="width: 25%; background-color: #0F1A13; border-radius: 8px; padding: 1rem; vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">🛡️</p><h5 style="font-weight: bold; margin-top: 0.5rem;">TPM 2.0</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin-bottom: 0.5rem;">硬件锚点</p><p style="font-size: 0.875rem;">提供防篡改的<strong style="color: #60A5FA;">密钥存储</strong>与<strong style="color: #60A5FA;">测量日志</strong>。</p></td>
+<td style="width: 25%; background-color: #0F1A13; border-radius: 8px; padding: 1rem; vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">📦</p><h5 style="font-weight: bold; margin-top: 0.5rem;">UKI</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin-bottom: 0.5rem;">原子化启动</p><p style="font-size: 0.875rem;">将<strong style="color: #A78BFA;">安全策略</strong>与内核一同签名，防止绕过。</p></td>
 </tr>
 </table>
+</div>
 
-<a id="-第三部分-实施案例研究">🛠️ 第三部分: 实施案例研究</a>
-<table>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 2rem; border-radius: 8px;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1.5rem;">2.3 协同作战：一个统一的防御体系</h4>
+<div style="border: 2px dashed #005A34; padding: 1.5rem; border-radius: 8px; max-width: 80%; margin: 0 auto; text-align: center;">
+<p style="font-weight: bold; font-size: 1.125rem;">场景: 用户执行 <code style="background-color: rgba(0,0,0,0.5); padding: 0.25rem 0.5rem; border-radius: 4px;">sudo ls</code></p>
+<br>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🚀 启动时: 信任锚定</h5><p style="font-size: 0.75rem; margin:0.5rem 0 0 0;">TPM检查<strong style="color: #60A5FA;">PCR7</strong>值，确认安全启动状态后，解封EVM密钥。</p></div>
+<div style="width: 2px; height: 1.5rem; background-color: #005A34; margin:auto;"></div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🔑 第1步: EVM验证元数据</h5><p style="font-size: 0.75rem; margin:0.5rem 0 0 0;">内核使用解封的密钥，验证<strong style="color: #FBBF24;">EVM签名</strong>。此举确保文件的IMA哈希值本身是可信的。</p></div>
+<div style="width: 2px; height: 1.5rem; background-color: #005A34; margin:auto;"></div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🕵️ 第2步: IMA评估文件内容</h5><p style="font-size: 0.75rem; margin:0.5rem 0 0 0;">内核计算文件实时哈希，并与可信的<strong style="color: #4ADE80;">IMA哈希</strong>对比。</p></div>
+<div style="width: 2px; height: 1.5rem; background-color: #005A34; margin:auto;"></div>
+<table width="100%" style="border-spacing: 1rem; border-collapse: separate;">
 <tr>
-<td width="50%" valign="top" style="border: 1px solid #005A34; border-radius: 8px; padding: 10px;">
-<h4 align="center"><font color="#00A859">3.1 定制核心：铸造安全基石</font></h4>
-<table width="100%">
-<tr align="center">
-<td>⚙️<br><strong>起点</strong><br><small>通用内核</small></td>
-<td>→</td>
-<td>🛡️<br><strong>加固</strong><br><small>移除非必需模块</small></td>
-<td>→</td>
-<td>🚦<br><strong>开启</strong><br><small>激活IMA/EVM</small></td>
-<td>→</td>
-<td>💎<br><strong>终点</strong><br><small>强化核心</small></td>
+<td width="50%" style="padding: 1rem; border-radius: 8px; text-align: center; background-color: rgba(22, 101, 52, 0.5); border: 1px solid #22C55E;"><p style="font-size: 1.25rem; font-weight: bold; color: #4ADE80; margin:0;">✅ 全部通过</p><p style="font-size: 0.875rem; margin:0.5rem 0 0 0;">允许执行</p></td>
+<td width="50%" style="padding: 1rem; border-radius: 8px; text-align: center; background-color: rgba(153, 27, 27, 0.5); border: 1px solid #EF4444;"><p style="font-size: 1.25rem; font-weight: bold; color: #F87171; margin:0;">❌ 任何一步失败</p><p style="font-size: 0.875rem; margin:0.5rem 0 0 0;">拒绝访问</p></td>
 </tr>
 </table>
+</div>
+</div>
+
+<div align="center" style="color: white; text-shadow: 0 0 8px rgba(0, 168, 89, 0.8);">🛠️ 第三部分: 实施案例研究</div>
+<table width="100%" style="border-spacing: 2rem; border-collapse: separate;">
+<tr>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.25rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top:0;">3.1 定制核心：铸造安全基石</h4>
+<table width="100%" style="text-align: center;"><tr>
+<td><p style="font-size: 1.875rem; margin:0;">⚙️</p><p style="font-weight: bold; font-size: 0.875rem;">起点: 通用内核</p><p style="font-size: 0.75rem; color: #9CA3AF;">功能丰富但攻击面大</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🛡️</p><p style="font-weight: bold; font-size: 0.875rem;">加固</p><p style="font-size: 0.75rem; color: #9CA3AF;">移除非必需模块</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🚦</p><p style="font-weight: bold; font-size: 0.875rem;">开启</p><p style="font-size: 0.75rem; color: #9CA3AF;">激活IMA/EVM/TPM</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">💎</p><p style="font-weight: bold; font-size: 0.875rem;">终点: 强化核心</p><p style="font-size: 0.75rem; color: #9CA3AF;">精简、坚固、安全</p></td>
+</tr></table>
+<p style="font-size: 0.75rem; margin-top: 1rem; text-align: center;">此流程遵循“最小权限”原则，通过加固和开启安全模块，将通用内核重塑为一个专为安全而生的、最小化的可信计算基。</p>
 </td>
-<td width="50%" valign="top" style="border: 1px solid #005A34; border-radius: 8px; padding: 10px;">
-<h4 align="center"><font color="#00A859">3.2 分层密钥管理策略</font></h4>
-<table width="100%">
-<tr align="center">
-<td>🏛️<br><strong>1. 创建根信任</strong><br><small>建立离线IMA根CA</small></td>
-<td>→</td>
-<td>✍️<br><strong>2. 签发工作密钥</strong><br><small>用于日常签名</small></td>
-</tr>
-<tr align="center">
-<td>🧠<br><strong>3. 嵌入内核</strong><br><small>将根CA公钥编译</small></td>
-<td>→</td>
-<td>🛡️<br><strong>4. 硬件密封</strong><br><small>用TPM密封EVM密钥</small></td>
-</tr>
-</table>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.25rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top:0;">3.2 分层密钥管理策略</h4>
+<table width="100%" style="text-align: center;"><tr>
+<td><p style="font-size: 1.875rem; margin:0;">🏛️</p><p style="font-weight: bold; font-size: 0.875rem;">1. 创建根信任</p><p style="font-size: 0.75rem; color: #9CA3AF;">建立离线IMA根CA</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">✍️</p><p style="font-weight: bold; font-size: 0.875rem;">2. 签发工作密钥</p><p style="font-size: 0.75rem; color: #9CA3AF;">用于日常文件签名</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🧠</p><p style="font-weight: bold; font-size: 0.875rem;">3. 嵌入内核</p><p style="font-size: 0.75rem; color: #9CA3AF;">将根CA公钥编译进去</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🛡️</p><p style="font-weight: bold; font-size: 0.875rem;">4. 硬件密封</p><p style="font-size: 0.75rem; color: #9CA3AF;">用TPM密封EVM密钥</p></td>
+</tr></table>
+<p style="font-size: 0.75rem; margin-top: 1rem; text-align: center;">此策略将软件层面的信任（IMA CA）与硬件锚定的信任（EVM密钥）分离又结合，构建了一个既灵活又坚固的加密骨干。</p>
 </td>
 </tr>
 <tr>
-<td width="50%" valign="top" style="border: 1px solid #005A34; border-radius: 8px; padding: 10px;">
-<h4 align="center"><font color="#00A859">3.3 分阶段部署策略</font></h4>
-<table width="100%">
-<tr align="center">
-<td>🧐<br><strong>1. 审计模式</strong><br><small><code>log</code></small></td>
-<td>→</td>
-<td>🏷️<br><strong>2. 修复与标记</strong><br><small><code>fix</code></small></td>
-<td>→</td>
-<td>✅<br><strong>3. 验证基线</strong><br><small>检查日志</small></td>
-<td>→</td>
-<td>🚦<br><strong>4. 强制执行</strong><br><small><code>enforce</code></small></td>
-</tr>
-</table>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.25rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top:0;">3.3 分阶段部署策略</h4>
+<table width="100%" style="text-align: center;"><tr>
+<td><p style="font-size: 1.875rem; margin:0;">🧐</p><p style="font-weight: bold; font-size: 0.875rem;">1. 审计模式</p><p style="font-size: 0.75rem; color: #9CA3AF;">ima_appraise=log</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🏷️</p><p style="font-weight: bold; font-size: 0.875rem;">2. 修复与标记</p><p style="font-size: 0.75rem; color: #9CA3AF;">ima_appraise=fix</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">✅</p><p style="font-weight: bold; font-size: 0.875rem;">3. 验证基线</p><p style="font-size: 0.75rem; color: #9CA3AF;">检查日志确保无误</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🚦</p><p style="font-weight: bold; font-size: 0.875rem;">4. 强制执行</p><p style="font-size: 0.75rem; color: #9CA3AF;">ima_appraise=enforce</p></td>
+</tr></table>
+<p style="font-size: 0.75rem; margin-top: 1rem; text-align: center;">这种渐进式方法确保了从宽松到严格的安全策略过渡是平滑且可控的，最大限度地减少了对生产环境的冲击。</p>
 </td>
-<td width="50%" valign="top" style="border: 1px solid #005A34; border-radius: 8px; padding: 10px;">
-<h4 align="center"><font color="#00A859">3.4 不可变启动：固化安全策略</font></h4>
-<table width="100%">
-<tr align="center">
-<td>📦<br><strong>1. 打包</strong><br><small>内核+策略+Initrd</small></td>
-<td>→</td>
-<td>✍️<br><strong>2. 签名</strong><br><small>使用安全启动密钥</small></td>
-<td>→</td>
-<td>🚀<br><strong>3. 加载</strong><br><small>引导程序加载</small></td>
-<td>→</td>
-<td>🛡️<br><strong>4. 验证</strong><br><small>UEFI固件验证</small></td>
-</tr>
-</table>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.25rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top:0;">3.4 不可变启动：固化安全策略</h4>
+<table width="100%" style="text-align: center;"><tr>
+<td><p style="font-size: 1.875rem; margin:0;">📦</p><p style="font-weight: bold; font-size: 0.875rem;">1. 打包</p><p style="font-size: 0.75rem; color: #9CA3AF;">内核+安全策略+Initrd</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">✍️</p><p style="font-weight: bold; font-size: 0.875rem;">2. 签名</p><p style="font-size: 0.75rem; color: #9CA3AF;">使用安全启动密钥</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🚀</p><p style="font-weight: bold; font-size: 0.875rem;">3. 加载</p><p style="font-size: 0.75rem; color: #9CA3AF;">引导加载程序加载</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🛡️</p><p style="font-weight: bold; font-size: 0.875rem;">4. 验证</p><p style="font-size: 0.75rem; color: #9CA3AF;">UEFI固件验证签名</p></td>
+</tr></table>
+<p style="font-size: 0.75rem; margin-top: 1rem; text-align: center;">此流程将安全策略本身变成一个受硬件保护的加密对象，彻底关闭了通过修改引导参数来绕过安全机制的后门。</p>
 </td>
 </tr>
 </table>
 
-<a id="-第四部分-实证验证与安全分析">🔬 第四部分: 实证验证与安全分析</a>
-<table>
+<div align="center" style="color: white; text-shadow: 0 0 8px rgba(0, 168, 89, 0.8);">🔬 第四部分: 实证验证与安全分析</div>
+<table width="100%" style="border-spacing: 2rem; border-collapse: separate;">
 <tr>
-<td width="50%" valign="top" style="border: 1px solid #005A34; border-radius: 8px; padding: 10px;">
-<h4 align="center"><font color="#00A859">4.1 场景一：运行时攻击</font></h4>
-<p align="center">✅ 初始状态 → ✍️ 攻击行为 → 🚫 执行尝试 → 🛡️ <strong>IMA 拦截</strong></p>
-<hr>
-<small>此演示证明IMA评估机制能有效阻止对受保护文件的任何运行时篡改，确保了可执行文件的完整性。</small>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top:0;">4.1 场景一：运行时攻击</h4>
+<table width="100%" style="text-align: center;"><tr>
+<td><p style="font-size: 1.875rem; margin:0;">✅</p><p style="font-weight: bold; font-size: 0.875rem;">1. 初始状态</p><p style="font-size: 0.75rem; color: #9CA3AF;">/usr/bin/ls 文件受IMA保护</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">✍️</p><p style="font-weight: bold; font-size: 0.875rem;">2. 攻击行为</p><p style="font-size: 0.75rem; color: #9CA3AF;">攻击者篡改文件内容</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🚫</p><p style="font-weight: bold; font-size: 0.875rem;">3. 执行尝试</p><p style="font-size: 0.75rem; color: #9CA3AF;">用户或系统尝试运行</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🛡️</p><p style="font-weight: bold; font-size: 0.875rem;">4. IMA 拦截</p><p style="font-size: 0.75rem; color: #9CA3AF;">哈希不匹配，访问被拒绝</p></td>
+</tr></table>
+<p style="font-size: 0.75rem; margin-top: 1rem; text-align: center;">此演示证明IMA评估机制能有效阻止对受保护文件的任何运行时篡改，确保了可执行文件的完整性。</p>
 </td>
-<td width="50%" valign="top" style="border: 1px solid #005A34; border-radius: 8px; padding: 10px;">
-<h4 align="center"><font color="#00A859">4.2 场景二：离线攻击</font></h4>
-<p align="center">👻 离线篡改 → 📝 伪造哈希 → 🔑 攻击失败 → 🛡️ <strong>EVM 防御</strong></p>
-<hr>
-<small>此分析证明了EVM与TPM的协同作用是防御离线攻击的关键，它保护了信任链中最脆弱的一环——元数据。</small>
+<td width="50%" style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; vertical-align: top;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem; margin-top:0;">4.2 场景二：离线攻击</h4>
+<table width="100%" style="text-align: center;"><tr>
+<td><p style="font-size: 1.875rem; margin:0;">👻</p><p style="font-weight: bold; font-size: 0.875rem;">1. 离线篡改</p><p style="font-size: 0.75rem; color: #9CA3AF;">攻击者修改/bin/sudo</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">📝</p><p style="font-weight: bold; font-size: 0.875rem;">2. 伪造哈希</p><p style="font-size: 0.75rem; color: #9CA3AF;">攻击者更新security.ima</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🔑</p><p style="font-weight: bold; font-size: 0.875rem;">3. 攻击失败点</p><p style="font-size: 0.75rem; color: #9CA3AF;">无法伪造EVM签名(密钥被TPM密封)</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">🛡️</p><p style="font-weight: bold; font-size: 0.875rem;">4. EVM 防御</p><p style="font-size: 0.75rem; color: #9CA3AF;">开机后EVM检测到签名无效</p></td>
+</tr></table>
+<p style="font-size: 0.75rem; margin-top: 1rem; text-align: center;">此分析证明了EVM与TPM的协同作用是防御离线攻击的关键，它保护了信任链中最脆弱的一环——元数据。</p>
 </td>
 </tr>
 </table>
 
-<a id="-第五部分-战略价值与应用前景">🚀 第五部分: 战略价值与应用前景</a>
-<table>
-<tr>
-<td width="33%" valign="top">
-<h4 align="center"><font color="#00A859">5.1 内核级零信任架构</font></h4>
-<ul>
-<li>🤔 <strong>从不信任，永远验证</strong></li>
-<li>🏰 <strong>假设泄露</strong></li>
-<li>👮 <strong>最小权限</strong></li>
-</ul>
-</td>
-<td width="33%" valign="top">
-<h4 align="center"><font color="#00A859">5.2 赋能远程证明</font></h4>
-<ol>
-<li>❓ <strong>挑战</strong>: 验证者发送随机数</li>
-<li>✍️ <strong>引用</strong>: TPM对PCR和随机数签名</li>
-<li>📨 <strong>响应</strong>: 发送引用和IMA日志</li>
-<li>✅ <strong>验证</strong>: 验证者重放日志并比对</li>
-</ol>
-</td>
-<td width="33%" valign="top">
-<h4 align="center"><font color="#00A859">5.3 在高风险环境中的应用</font></h4>
-<p align="center">
-☁️ 云计算 &nbsp;&nbsp; 🏭 关键基础设施<br>
-🛰️ 物联网(IoT) &nbsp;&nbsp; 💳 金融服务
-</p>
-</td>
-</tr>
-</table>
+<div align="center" style="color: white; text-shadow: 0 0 8px rgba(0, 168, 89, 0.8);">🚀 第五部分: 战略价值与应用前景</div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem;">5.1 内核级零信任架构</h4>
+<div style="max-width: 80%; margin: 0 auto; text-align: center;">
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🤔 原则一: 从不信任，永远验证</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin:0.5rem 0 0 0;">系统不再假定内部文件可信，每次访问都需实时验证。</p></div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🏰 原则二: 假设泄露</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin:0.5rem 0 0 0;">防御内置于系统底层，而非依赖脆弱的边界。</p></div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">👮 原则三: 最小权限</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin:0.5rem 0 0 0;">即便是root也无法执行被篡改的代码，限制破坏范围。</p></div>
+</div>
+</div>
 
-<a id="-第六部分-结论与展望">🏁 第六部分: 结论与展望</a>
-<table>
-<tr>
-<td width="50%" valign="top">
-<h4 align="center"><font color="#00A859">6.1 成果总结</font></h4>
-<blockquote>
-<p>🔗 <strong>端到端信任链</strong><br>
-🛡️ <strong>深度防御</strong><br>
-🎯 <strong>零信任落地</strong></p>
-</blockquote>
-</td>
-<td width="50%" valign="top">
-<h4 align="center"><font color="#00A859">6.2 未来展望</font></h4>
-<table width="100%">
-<tr align="center">
-<td>📡<br>集成远程证明</td>
-<td>🔬<br>细粒度策略</td>
-<td>⏱️<br>性能基准测试</td>
-</tr>
-</table>
-</td>
-</tr>
-</table>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem;">5.2 赋能远程证明</h4>
+<table width="100%" style="text-align: center;"><tr>
+<td><p style="font-size: 1.875rem; margin:0;">❓</p><p style="font-weight: bold; font-size: 0.875rem;">1. 挑战</p><p style="font-size: 0.75rem; color: #9CA3AF;">验证者发送随机数</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">✍️</p><p style="font-weight: bold; font-size: 0.875rem;">2. 引用</p><p style="font-size: 0.75rem; color: #9CA3AF;">TPM对PCR和随机数签名</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">📨</p><p style="font-weight: bold; font-size: 0.875rem;">3. 响应</p><p style="font-size: 0.75rem; color: #9CA3AF;">发送引用和IMA日志</p></td>
+<td><p style="font-size: 1.875rem; margin:0;">✅</p><p style="font-weight: bold; font-size: 0.875rem;">4. 验证</p><p style="font-size: 0.75rem; color: #9CA3AF;">验证者重放日志并比对</p></td>
+</tr></table>
+</div>
+
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem;">5.3 在高风险环境中的应用</h4>
+<table width="100%" style="text-align: center; border-spacing: 1.5rem; border-collapse: separate;"><tr>
+<td style="vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">☁️</p><p style="font-weight: bold; font-size: 0.875rem; margin-top: 0.5rem;">云计算</p><p style="font-size: 0.75rem; color: #9CA3AF;">确保VM镜像完整性，为客户提供可信证明。</p></td>
+<td style="vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">🏭</p><p style="font-weight: bold; font-size: 0.875rem; margin-top: 0.5rem;">关键基础设施</p><p style="font-size: 0.75rem; color: #9CA3AF;">锁定工控系统软件，防止未经授权的变更。</p></td>
+<td style="vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">🛰️</p><p style="font-weight: bold; font-size: 0.875rem; margin-top: 0.5rem;">物联网 (IoT)</p><p style="font-size: 0.75rem; color: #9CA3AF;">保证海量设备固件安全，实现可信远程管理。</p></td>
+<td style="vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">💳</p><p style="font-weight: bold; font-size: 0.875rem; margin-top: 0.5rem;">金融服务</p><p style="font-size: 0.75rem; color: #9CA3AF;">保护交易软件，提供不可变的审计追踪。</p></td>
+</tr></table>
+</div>
+
+<div align="center" style="color: white; text-shadow: 0 0 8px rgba(0, 168, 89, 0.8);">🏁 第六部分: 结论与展望</div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem;">6.1 成果总结</h4>
+<div style="max-width: 80%; margin: 0 auto; text-align: center;">
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🔗 端到端信任链</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin:0.5rem 0 0 0;">成功构建了从硬件加电到应用程序运行的、完整且可验证的信任链。</p></div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🛡️ 深度防御</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin:0.5rem 0 0 0;">有效抵御了包括运行时代码注入和离线物理篡改在内的多种高级威胁。</p></div>
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1rem; border-radius: 8px;"><h5 style="font-weight: bold; font-size: 1.125rem; color: #6BDBAD; margin:0;">🎯 零信任落地</h5><p style="font-size: 0.75rem; color: #9CA3AF; margin:0.5rem 0 0 0;">将零信任安全理念在操作系统核心层面进行了切实的工程化落地。</p></div>
+</div>
+</div>
+
+<div style="background-color: #1B2D24; border: 1px solid #005A34; padding: 1.5rem; border-radius: 8px;">
+<h4 style="font-size: 1.5rem; font-weight: bold; text-align: center; color: #00A859; margin-bottom: 1rem;">6.2 未来展望</h4>
+<table width="100%" style="text-align: center; border-spacing: 1.5rem; border-collapse: separate;"><tr>
+<td style="vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">📡</p><p style="font-weight: bold; font-size: 0.875rem; margin-top: 0.5rem;">集成远程证明</p><p style="font-size: 0.75rem; color: #9CA3AF;">与Keylime等验证器集成，实现自动化信任监控。</p></td>
+<td style="vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">🔬</p><p style="font-weight: bold; font-size: 0.875rem; margin-top: 0.5rem;">细粒度策略</p><p style="font-size: 0.75rem; color: #9CA3AF;">为特定应用（如数据库）定制更精确的保护策略。</p></td>
+<td style="vertical-align: top;"><p style="font-size: 2.25rem; margin:0;">⏱️</p><p style="font-weight: bold; font-size: 0.875rem; margin-top: 0.5rem;">性能基准测试</p><p style="font-size: 0.75rem; color: #9CA3AF;">量化不同策略对系统性能的影响，指导部署。</p></td>
+</tr></table>
+</div>
