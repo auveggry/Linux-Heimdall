@@ -211,21 +211,14 @@ Secure Boot (UKI) → Kernel Space (IMA/EVM) → Runtime Software
 </td>
 <td width="50%" valign="top">
 <h4 align="center">5.2 Empowering Remote Attestation</h4>
-<p align="center">⚡ → ✍️ → 📨 → 🌀<br><small>Challenge → Quote → Respond → Verify</small></p>
-<hr>
+<ul><li><b>⚡ → ✍️ → 📨 → 🌀</b><br><blockquote><small>Challenge → Quote → Respond → Verify</small></blockquote></li></ul>
 <h4 align="center">5.3 Applications in High-Risk Environments</h4>
-<table width="100%">
-<tbody>
-<tr>
-<td align="center" valign="top">☁️<br><b>Cloud Computing</b><br><blockquote><small>Ensure VM image integrity</small></blockquote></td>
-<td align="center" valign="top">🏭<br><b>Critical Infrastructure</b><br><blockquote><small>Lock down ICS software</small></blockquote></td>
-</tr>
-<tr>
-<td align="center" valign="top">🛰️<br><b>Internet of Things (IoT)</b><br><blockquote><small>Secure firmware for mass devices</small></blockquote></td>
-<td align="center" valign="top">💳<br><b>Financial Services</b><br><blockquote><small>Protect transaction software</small></blockquote></td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li>☁️ <b>Cloud Computing:</b> <small>Ensure VM image integrity.</small></li>
+<li>🏭 <b>Critical Infrastructure:</b> <small>Lock down ICS software.</small></li>
+<li>🛰️ <b>Internet of Things (IoT):</b> <small>Secure firmware for mass devices.</small></li>
+<li>💳 <b>Financial Services:</b> <small>Protect transaction software.</small></li>
+</ul>
 </td>
 </tr>
 </tbody>
