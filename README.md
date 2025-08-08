@@ -22,6 +22,13 @@
 <a href="https://github.com/auveggry/Linux-Heimdall" target="_blank">
 <img src="https://img.shields.io/github/stars/auveggry/Linux-Heimdall?style=for-the-badge" alt="GitHub stars">
 </a>
+<br>
+<a href="README_zh-CN.md" target="_blank">
+<img src="https://img.shields.io/badge/阅读中文版本-brightgreen?style=for-the-badge" alt="Chinese Version">
+</a>
+<a href="README_ja-JP.md" target="_blank">
+<img src="https://img.shields.io/badge/日本語版を読む-blue?style=for-the-badge" alt="Japanese Version">
+</a>
 </div>
 
 <p align="center">
