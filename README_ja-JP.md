@@ -29,6 +29,10 @@
 <a href="README_ja-JP.md" target="_blank">
 <img src="https://img.shields.io/badge/日本語版を読む-blue.svg?style=for-the-badge" alt="日本語版">
 </a>
+<br>
+<a href="https://sakurame.eu.org/2025/08/07/privacy/%E4%B8%80%E4%B8%AA%E5%BC%80%E6%BA%90%E7%9A%84Linux%E5%86%85%E6%A0%B8%E5%AE%89%E5%85%A8%E5%BC%BA%E5%8C%96%E9%A1%B9%E7%9B%AE/" target="_blank">
+<img src="https://img.shields.io/badge/ブログで全文を読む-00A859?style=for-the-badge" alt="ブログで読む">
+</a>
 </div>
 
 <p align="center">
