@@ -33,57 +33,7 @@
 <a href="#part6">结论展望</a>
 </p>
 
-<div id="part1"></div>
-<h3 align="center">第一部分: 完整性缺口分析</h3>
-<table width="100%">
-<tbody>
-<tr>
-<td colspan="2">
-<h4 align="center">1.1 安全启动的幻象：信任链的断裂点</h4>
-</td>
-</tr>
-<tr>
-<td width="50%" align="center" valign="top">
-<p><b><font color="#4ADE80">启动时验证</font></b></p>
-<p>UEFI Firmware<br>↓<br>Bootloader<br>↓<br>Kernel Loaded</p>
-<p>⚡️ <b><font color="#F87171">信任断裂</font></b> ⚡️</p>
-<p>Runtime Vulnerable</p>
-</td>
-<td width="50%" valign="top">
-<ul>
-<li>🛡️ <b><font color="#4ADE80">阶段一：启动时验证</font></b><br><blockquote>UEFI固件验证引导加载器和内核的签名，确保启动过程的初始纯洁性。</blockquote></li>
-<li>🏁 <b><font color="#FBBF24">阶段二：信任交接</font></b><br><blockquote>内核成功加载后，安全启动的使命完成。信任链在此刻交接，但传统上并未延续。</blockquote></li>
-<li>🚨 <b><font color="#F87171">阶段三：运行时风险暴露</font></b><br><blockquote>所有用户空间的应用、库和配置文件都处于无监控状态，为攻击者留下了广阔的攻击面。</blockquote></li>
-</ul>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-<h4 align="center">1.2 运行时威胁：系统内部的背叛</h4>
-<p align="center">
-<b><font color="#4ADE80">事前: 合法执行</font></b><br>
-💻<br>
-<code>/bin/sudo</code><br>
-✅
-</p>
-<p align="center">
-→ 🦠 🔓 →<br>
-<small><font color="#F87171">恶意软件注入</font></small>
-</p>
-<p align="center">
-<b><font color="#F87171">事后: 恶意行为</font></b><br>
-💀<br>
-<code>/bin/sudo</code> (内容已被篡改)
-</p>
-<blockquote><b>关键漏洞：内核的盲点</b><br>传统内核在执行文件时，信任的是文件的<b>路径</b>而非<b>内容</b>。它无法感知到该路径指向的文件内容已被恶意替换。</blockquote>
-</td>
-<td width="50%" valign="top">
-<h4 align="center">1.3 离线威胁：“邪恶女仆”攻击</h4>
-<p align="center"><b>攻击者路径</b><br>👻 (物理接触) → 💾 (离线挂载) → 📝 (篡改文件)</p>
-<br>
-<blockquote><b>关键漏洞：仅有IMA的系统为何会失效？</b><br>攻击者不仅修改了文件内容，还利用离线权限，重新计算并覆盖了文件的“合法”哈希值。</blockquote>
-<pre><code># 1. 替换合法文件为恶意程序
-echo 'malware' > /bin/sudo
+<div id="part1"></div> <h3 align="center">第一部分: 完整性缺口分析</h3> <table width="100%"> <tbody> <tr> <td colspan="2"> <h4 align="center">1.1 安全启动的幻象：信任链的断裂点</h4> </td> </tr> <tr> <td width="50%" align="center" valign="top"> <p><b><font color="#4ADE80">启动时验证</font></b></p> <p>UEFI Firmware<br>↓<br>Bootloader<br>↓<br>Kernel Loaded</p> <p>⚡️ <b><font color="#F87171">信任断裂</font></b> ⚡️</p> <p>Runtime Vulnerable</p> </td> <td width="50%" valign="top"> <ul> <li>🛡️ <b><font color="#4ADE80">阶段一：启动时验证</font></b><br><blockquote>UEFI固件验证引导加载器和内核的签名，确保启动过程的初始纯洁性。</blockquote></li> <li>🏁 <b><font color="#FBBF24">阶段二：信任交接</font></b><br><blockquote>内核成功加载后，安全启动的使命完成。信任链在此刻交接，但传统上并未延续。</blockquote></li> <li>🚨 <b><font color="#F87171">阶段三：运行时风险暴露</font></b><br><blockquote>所有用户空间的应用、库和配置文件都处于无监控状态，为攻击者留下了广阔的攻击面。</blockquote></li> </ul> </td> </tr> <tr> <td width="50%" valign="top"> <h4 align="center">1.2 运行时威胁：系统内部的背叛</h4> <p align="center"> <b><font color="#4ADE80">事前: 合法执行</font></b><br> 💻<br> <code>/bin/sudo</code><br> ✅ </p> <p align="center"> 🦠→  🔓 → 😭 <br> <small><font color="#F87171">恶意软件注入</font></small> </p> <p align="center"> <b><font color="#F87171">事后: 恶意行为</font></b><br> 💀<br> <code>/bin/sudo</code> (内容已被篡改) </p> <blockquote><b>关键漏洞：内核的盲点</b><br>传统内核在执行文件时，信任的是文件的<b>路径</b>而非<b>内容</b>。它无法感知到该路径指向的文件内容已被恶意替换。</blockquote> </td> <td width="50%" valign="top"> <h4 align="center">1.3 离线威胁：“邪恶女仆”攻击</h4> <p align="center"><b>攻击者路径</b><br>👻 (物理接触) → 💾 (离线挂载) → 📝 (篡改文件)</p> <br> <blockquote><b>关键漏洞：仅有IMA的系统为何会失效？</b><br>攻击者不仅修改了文件内容，还利用离线权限，重新计算并覆盖了文件的“合法”哈希值。</blockquote> <pre><code># 1. 替换合法文件为恶意程序 echo 'malware' > /bin/sudo
 
 2. 重新计算并伪造新的“合法”哈希值
 new_hash=$(sha256sum /bin/sudo)
@@ -138,99 +88,11 @@ setfattr -n security.ima -v "$new_hash" /bin/sudo</code></pre>
 </table>
 <hr>
 
-<div id="part3"></div>
-<h3 align="center">第三部分: 实施案例研究</h3>
-<table width="100%">
-<tbody>
-<tr>
-<td width="50%" valign="top">
-<h4 align="center">3.1 定制核心：铸造安全基石</h4>
-<p align="center">⚙️ → 🛡️ → 🚦 → 💎</p>
-<p align="center"><small>通用内核 → 加固 → 开启 → 强化核心</small></p>
-<blockquote><small>此流程遵循“最小权限”原则，通过加固和开启安全模块，将通用内核重塑为一个专为安全而生的、最小化的可信计算基。</small></blockquote>
-</td>
-<td width="50%" valign="top">
-<h4 align="center">3.2 分层密钥管理策略</h4>
-<p align="center">🏛️ → ✍️ → 🧠 → 🛡️</p>
-<p align="center"><small>创建根信任 → 签发工作密钥 → 嵌入内核 → 硬件密封</small></p>
-<blockquote><small>此策略将软件层面的信任（IMA CA）与硬件锚定的信任（EVM密钥）分离又结合，构建了一个既灵活又坚固的加密骨干。</small></blockquote>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-<h4 align="center">3.3 分阶段部署策略</h4>
-<p align="center">🧐 → 🏷️ → ✅ → 🚦</p>
-<p align="center"><small>审计模式 → 修复与标记 → 验证基线 → 强制执行</small></p>
-<blockquote><small>这种渐进式方法确保了从宽松到严格的安全策略过渡是平滑且可控的，最大限度地减少了对生产环境的冲击。</small></blockquote>
-</td>
-<td width="50%" valign="top">
-<h4 align="center">3.4 不可变启动：固化安全策略</h4>
-<p align="center">📦 → ✍️ → 🚀 → 🛡️</p>
-<p align="center"><small>打包 → 签名 → 加载 → 验证</small></p>
-<blockquote><small>此流程将安全策略本身变成一个受硬件保护的加密对象，彻底关闭了通过修改引导参数来绕过安全机制的后门。</small></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<hr>
+<div id="part3"></div> <h3 align="center">第三部分: 实施案例研究</h3> <table width="100%"> <tbody> <tr> <td width="50%" valign="top"> <h4 align="center">3.1 定制核心：铸造安全基石</h4> <p align="center">⚙️ → 🛡️ → 🚦 → 💎</p> <p align="center"><small>通用内核 → 加固 → 开启 → 强化核心</small></p> <blockquote><small>此流程遵循“最小权限”原则，通过加固和开启安全模块，将通用内核重塑为一个专为安全而生的、最小化的可信计算基。</small></blockquote> </td> <td width="50%" valign="top"> <h4 align="center">3.2 分层密钥管理策略</h4> <p align="center">🏛️ → ✍️ → 🧠 → 🛡️</p> <p align="center"><small>创建根信任 → 签发工作密钥 → 嵌入内核 → 硬件密封</small></p> <blockquote><small>此策略将软件层面的信任（IMA CA）与硬件锚定的信任（EVM密钥）分离又结合，构建了一个既灵活又坚固的加密骨干。</small></blockquote> </td> </tr> <tr> <td width="50%" valign="top"> <h4 align="center">3.3 分阶段部署策略</h4> <p align="center">🧐 → 🏷️ → 🧬  → 🚦</p> <p align="center"><small>审计模式 → 修复与标记 → 验证基线 → 强制执行</small></p> <blockquote><small>这种渐进式方法确保了从宽松到严格的安全策略过渡是平滑且可控的，最大限度地减少了对生产环境的冲击。</small></blockquote> </td> <td width="50%" valign="top"> <h4 align="center">3.4 不可变启动：固化安全策略</h4> <p align="center">📦 → ✍️ → 🚀 → 🛡️</p> <p align="center"><small>打包 → 签名 → 加载 → 验证</small></p> <blockquote><small>此流程将安全策略本身变成一个受硬件保护的加密对象，彻底关闭了通过修改引导参数来绕过安全机制的后门。</small></blockquote> </td> </tr> </tbody> </table> <hr>
 
-<div id="part4"></div>
-<h3 align="center">第四部分: 实证验证与安全分析</h3>
-<table width="100%">
-<tbody>
-<tr>
-<td width="50%" valign="top">
-<h4 align="center">4.1 场景一：运行时攻击</h4>
-<p align="center">✅ → ✍️ → 🚫 → 🛡️</p>
-<p align="center"><small>初始状态 → 攻击行为 → 执行尝试 → IMA拦截</small></p>
-<blockquote><small>此演示证明IMA评估机制能有效阻止对受保护文件的任何运行时篡改，确保了可执行文件的完整性。</small></blockquote>
-</td>
-<td width="50%" valign="top">
-<h4 align="center">4.2 场景二：离线攻击</h4>
-<p align="center">👻 → 📝 → 🔑 → 🛡️</p>
-<p align="center"><small>离线篡改 → 伪造哈希 → 攻击失败点 → EVM防御</small></p>
-<blockquote><small>此分析证明了EVM与TPM的协同作用是防御离线攻击的关键，它保护了信任链中最脆弱的一环——元数据。</small></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<hr>
+<div id="part4"></div> <h3 align="center">第四部分: 实证验证与安全分析</h3> <table width="100%"> <tbody> <tr> <td width="50%" valign="top"> <h4 align="center">4.1 场景一：运行时攻击</h4> <p align="center"> 🌕 → ✍️ → 🚫 → 🛡️</p> <p align="center"><small>初始状态 → 攻击行为 → 执行尝试 → IMA拦截</small></p> <blockquote><small>此演示证明IMA评估机制能有效阻止对受保护文件的任何运行时篡改，确保了可执行文件的完整性。</small></blockquote> </td> <td width="50%" valign="top"> <h4 align="center">4.2 场景二：离线攻击</h4> <p align="center">👻 → 📝 → 🔑 → 🛡️</p> <p align="center"><small>离线篡改 → 伪造哈希 → 攻击失败点 → EVM防御</small></p> <blockquote><small>此分析证明了EVM与TPM的协同作用是防御离线攻击的关键，它保护了信任链中最脆弱的一环——元数据。</small></blockquote> </td> </tr> </tbody> </table> <hr>
 
-<div id="part5"></div>
-<h3 align="center">第五部分: 战略价值与应用前景</h3>
-<table width="100%">
-<tbody>
-<tr>
-<td width="50%" valign="top">
-<h4 align="center">5.1 内核级零信任架构</h4>
-<ul>
-<li><b>🤔 从不信任，永远验证:</b><br><blockquote><small>系统不再假定内部文件可信，每次访问都需实时验证。</small></blockquote></li>
-<li><b>🏰 假设泄露:</b><br><blockquote><small>防御内置于系统底层，而非依赖脆弱的边界。</small></blockquote></li>
-<li><b>👮 最小权限:</b><br><blockquote><small>即便是root也无法执行被篡改的代码，限制破坏范围。</small></blockquote></li>
-</ul>
-</td>
-<td width="50%" valign="top">
-<h4 align="center">5.2 赋能远程证明</h4>
-<p align="center">❓ → ✍️ → 📨 → ✅<br><small>挑战 → 引用 → 响应 → 验证</small></p>
-<hr>
-<h4 align="center">5.3 在高风险环境中的应用</h4>
-<table width="100%">
-<tbody>
-<tr>
-<td align="center" valign="top">☁️<br><b>云计算</b><br><blockquote><small>确保VM镜像完整性</small></blockquote></td>
-<td align="center" valign="top">🏭<br><b>关键基础设施</b><br><blockquote><small>锁定工控系统软件</small></blockquote></td>
-</tr>
-<tr>
-<td align="center" valign="top">🛰️<br><b>物联网 (IoT)</b><br><blockquote><small>保证海量设备固件安全</small></blockquote></td>
-<td align="center" valign="top">💳<br><b>金融服务</b><br><blockquote><small>保护交易软件</small></blockquote></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<hr>
+<div id="part5"></div> <h3 align="center">第五部分: 战略价值与应用前景</h3> <table width="100%"> <tbody> <tr> <td width="50%" valign="top"> <h4 align="center">5.1 内核级零信任架构</h4> <ul> <li><b>🤔 从不信任，永远验证:</b><br><blockquote><small>系统不再假定内部文件可信，每次访问都需实时验证。</small></blockquote></li> <li><b>🏰 假设泄露:</b><br><blockquote><small>防御内置于系统底层，而非依赖脆弱的边界。</small></blockquote></li> <li><b>👮 最小权限:</b><br><blockquote><small>即便是root也无法执行被篡改的代码，限制破坏范围。</small></blockquote></li> </ul> </td> <td width="50%" valign="top"> <h4 align="center">5.2 赋能远程证明</h4> <p align="center">⚡ → ✍️ → 📨 → 🌀 <br><small>挑战 → 引用 → 响应 → 验证</small></p> <hr> <h4 align="center">5.3 在高风险环境中的应用</h4> <table width="100%"> <tbody> <tr> <td align="center" valign="top">☁️<br><b>云计算</b><br><blockquote><small>确保VM镜像完整性</small></blockquote></td> <td align="center" valign="top">🏭<br><b>关键基础设施</b><br><blockquote><small>锁定工控系统软件</small></blockquote></td> </tr> <tr> <td align="center" valign="top">🛰️<br><b>物联网 (IoT)</b><br><blockquote><small>保证海量设备固件安全</small></blockquote></td> <td align="center" valign="top">💳<br><b>金融服务</b><br><blockquote><small>保护交易软件</small></blockquote></td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <hr>
 
 <div id="part6"></div>
 <h3 align="center">第六部分: 结论与展望</h3>
