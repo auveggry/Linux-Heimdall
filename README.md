@@ -146,13 +146,13 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <tr>
 <td width="50%" valign="top">
 <h4 align="center">3.1 定制核心：铸造安全基石</h4>
-<p align="center">⚙️<br>↓<br>🛡️<br>↓<br>🚦<br>↓<br>💎</p>
+<p align="center">⚙️ → 🛡️ → 🚦 → 💎</p>
 <p align="center"><small>通用内核 → 加固 → 开启 → 强化核心</small></p>
 <blockquote><small>此流程遵循“最小权限”原则，将通用内核重塑为一个专为安全而生的、最小化的可信计算基。</small></blockquote>
 </td>
 <td width="50%" valign="top">
 <h4 align="center">3.2 分层密钥管理策略</h4>
-<p align="center">🏛️<br>↓<br>✍️<br>↓<br>🧠<br>↓<br>🛡️</p>
+<p align="center">🏛️ → ✍️ → 🧠 → 🛡️</p>
 <p align="center"><small>创建根信任 → 签发工作密钥 → 嵌入内核 → 硬件密封</small></p>
 <blockquote><small>此策略将软件层面的信任与硬件锚定的信任分离又结合，构建了一个既灵活又坚固的加密骨干。</small></blockquote>
 </td>
@@ -160,13 +160,13 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <tr>
 <td width="50%" valign="top">
 <h4 align="center">3.3 分阶段部署策略</h4>
-<p align="center">🧐<br>↓<br>🏷️<br>↓<br>✅<br>↓<br>🚦</p>
+<p align="center">🧐 → 🏷️ → ✅ → 🚦</p>
 <p align="center"><small>审计模式 → 修复与标记 → 验证基线 → 强制执行</small></p>
 <blockquote><small>这种渐进式方法确保了从宽松到严格的安全策略过渡是平滑且可控的，最大限度地减少了对生产环境的冲击。</small></blockquote>
 </td>
 <td width="50%" valign="top">
 <h4 align="center">3.4 不可变启动：固化安全策略</h4>
-<p align="center">📦<br>↓<br>✍️<br>↓<br>🚀<br>↓<br>🛡️</p>
+<p align="center">📦 → ✍️ → 🚀 → 🛡️</p>
 <p align="center"><small>打包 → 签名 → 加载 → 验证</small></p>
 <blockquote><small>此流程将安全策略本身变成一个受硬件保护的加密对象，彻底关闭了通过修改引导参数来绕过安全机制的后门。</small></blockquote>
 </td>
@@ -183,13 +183,13 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <tr>
 <td width="50%" valign="top">
 <h4 align="center">4.1 场景一：运行时攻击</h4>
-<p align="center">✅<br>↓<br>✍️<br>↓<br>🚫<br>↓<br>🛡️</p>
+<p align="center">✅ → ✍️ → 🚫 → 🛡️</p>
 <p align="center"><small>初始状态 → 攻击行为 → 执行尝试 → IMA拦截</small></p>
 <blockquote><small>此演示证明IMA评估机制能有效阻止对受保护文件的任何运行时篡改，确保了可执行文件的完整性。</small></blockquote>
 </td>
 <td width="50%" valign="top">
 <h4 align="center">4.2 场景二：离线攻击</h4>
-<p align="center">👻<br>↓<br>📝<br>↓<br>🔑<br>↓<br>🛡️</p>
+<p align="center">👻 → 📝 → 🔑 → 🛡️</p>
 <p align="center"><small>离线篡改 → 伪造哈希 → 攻击失败点 → EVM防御</small></p>
 <blockquote><small>此分析证明了EVM与TPM的协同作用是防御离线攻击的关键，它保护了信任链中最脆弱的一环——元数据。</small></blockquote>
 </td>
