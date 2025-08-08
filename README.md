@@ -24,10 +24,10 @@
 </a>
 <br>
 <a href="README_zh-CN.md" target="_blank">
-<img src="https://img.shields.io/badge/阅读中文版本-brightgreen?style=for-the-badge" alt="Chinese Version">
+<img src="https://img.shields.io/badge/阅读简体中文版本%20(Read%20in%20Chinese)-brightgreen.svg?style=for-the-badge" alt="Chinese Version">
 </a>
 <a href="README_ja-JP.md" target="_blank">
-<img src="https://img.shields.io/badge/日本語版を読む-blue?style=for-the-badge" alt="Japanese Version">
+<img src="https://img.shields.io/badge/日本語版を読む%20(Read%20in%20Japanese)-blue.svg?style=for-the-badge" alt="Japanese Version">
 </a>
 </div>
 
