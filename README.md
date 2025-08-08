@@ -10,7 +10,6 @@
 </div>
 
 <div align="center">
-<!-- 修改点：添加了更多徽章，丰富样式 -->
 <a href="https://sakurame.eu.org/2025/08/07/privacy/%E4%B8%80%E4%B8%AA%E5%BC%80%E6%BA%90%E7%9A%84Linux%E5%86%85%E6%A0%B8%E5%AE%89%E5%85%A8%E5%BC%BA%E5%8C%96%E9%A1%B9%E7%9B%AE/" target="_blank">
 <img src="https://img.shields.io/badge/博客-阅读全文-00A859?style=for-the-badge&logo=blogger" alt="在博客上查看">
 </a>
@@ -153,7 +152,7 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 </td>
 <td width="50%" valign="top">
 <h4 align="center">3.2 分层密钥管理策略</h4>
-<p align="center">🏛️ → ✍️ → 🧠 → 🛡️</p>
+<p align="center">🏛️<br>↓<br>✍️<br>↓<br>🧠<br>↓<br>🛡️</p>
 <p align="center"><small>创建根信任 → 签发工作密钥 → 嵌入内核 → 硬件密封</small></p>
 <blockquote><small>此策略将软件层面的信任与硬件锚定的信任分离又结合，构建了一个既灵活又坚固的加密骨干。</small></blockquote>
 </td>
@@ -161,13 +160,13 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <tr>
 <td width="50%" valign="top">
 <h4 align="center">3.3 分阶段部署策略</h4>
-<p align="center">🧐 → 🏷️ → ✅ → 🚦</p>
+<p align="center">🧐<br>↓<br>🏷️<br>↓<br>✅<br>↓<br>🚦</p>
 <p align="center"><small>审计模式 → 修复与标记 → 验证基线 → 强制执行</small></p>
 <blockquote><small>这种渐进式方法确保了从宽松到严格的安全策略过渡是平滑且可控的，最大限度地减少了对生产环境的冲击。</small></blockquote>
 </td>
 <td width="50%" valign="top">
 <h4 align="center">3.4 不可变启动：固化安全策略</h4>
-<p align="center">📦 → ✍️ → 🚀 → 🛡️</p>
+<p align="center">📦<br>↓<br>✍️<br>↓<br>🚀<br>↓<br>🛡️</p>
 <p align="center"><small>打包 → 签名 → 加载 → 验证</small></p>
 <blockquote><small>此流程将安全策略本身变成一个受硬件保护的加密对象，彻底关闭了通过修改引导参数来绕过安全机制的后门。</small></blockquote>
 </td>
@@ -190,7 +189,7 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 </td>
 <td width="50%" valign="top">
 <h4 align="center">4.2 场景二：离线攻击</h4>
-<p align="center">👻 → 📝 → 🔑 → 🛡️</p>
+<p align="center">👻<br>↓<br>📝<br>↓<br>🔑<br>↓<br>🛡️</p>
 <p align="center"><small>离线篡改 → 伪造哈希 → 攻击失败点 → EVM防御</small></p>
 <blockquote><small>此分析证明了EVM与TPM的协同作用是防御离线攻击的关键，它保护了信任链中最脆弱的一环——元数据。</small></blockquote>
 </td>
@@ -212,10 +211,11 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <li><b>🏰 假设泄露:</b><br><blockquote><small>防御内置于系统底层，而非依赖脆弱的边界。</small></blockquote></li>
 <li><b>👮 最小权限:</b><br><blockquote><small>即便是root也无法执行被篡改的代码，限制破坏范围。</small></blockquote></li>
 </ul>
-<h4 align="center">5.2 赋能远程证明</h4>
-<p align="center">❓ → ✍️ → 📨 → ✅<br><small>挑战 → 引用 → 响应 → 验证</small></p>
 </td>
 <td width="50%" valign="top">
+<h4 align="center">5.2 赋能远程证明</h4>
+<p align="center">❓ → ✍️ → 📨 → ✅<br><small>挑战 → 引用 → 响应 → 验证</small></p>
+<hr>
 <h4 align="center">5.3 在高风险环境中的应用</h4>
 <table width="100%">
 <tbody>
