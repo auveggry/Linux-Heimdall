@@ -1,6 +1,6 @@
 <div align="center">
 <a href="https://github.com/auveggry/Linux-Heimdall">
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Nils_Asplund_-_Heimdal.jpg" alt="北欧神话中的守护神海姆达尔的艺术图" style="max-width: 800px; width: 100%; border-radius: 8px;">
+<img src="https://ptpimg.me/my2mi2.jpg" alt="北欧神话中的守护神海姆达尔的艺术图" style="max-width: 800px; width: 100%; border-radius: 8px;">
 </a>
 <br><br>
 <h3 style="color: #6BDBAD;">项目命名缘由：神话与技术的交汇</h3>
