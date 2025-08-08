@@ -10,6 +10,7 @@
 </div>
 
 <div align="center">
+<!-- 修改点：添加了更多徽章，丰富样式 -->
 <a href="https://sakurame.eu.org/2025/08/07/privacy/%E4%B8%80%E4%B8%AA%E5%BC%80%E6%BA%90%E7%9A%84Linux%E5%86%85%E6%A0%B8%E5%AE%89%E5%85%A8%E5%BC%BA%E5%8C%96%E9%A1%B9%E7%9B%AE/" target="_blank">
 <img src="https://img.shields.io/badge/博客-阅读全文-00A859?style=for-the-badge&logo=blogger" alt="在博客上查看">
 </a>
@@ -84,11 +85,9 @@
 echo 'malware' > /bin/sudo
 
 2. 计算新哈希
-
 new_hash=$(sha256sum /bin/sudo)
 
 3. 伪造IMA哈希
-
 setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <p align="center">当系统重启，IMA会错误地信任被篡改的文件！</p>
 </td>
@@ -148,7 +147,7 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <tr>
 <td width="50%" valign="top">
 <h4 align="center">3.1 定制核心：铸造安全基石</h4>
-<p align="center">⚙️ → 🛡️ → 🚦 → 💎</p>
+<p align="center">⚙️<br>↓<br>🛡️<br>↓<br>🚦<br>↓<br>💎</p>
 <p align="center"><small>通用内核 → 加固 → 开启 → 强化核心</small></p>
 <blockquote><small>此流程遵循“最小权限”原则，将通用内核重塑为一个专为安全而生的、最小化的可信计算基。</small></blockquote>
 </td>
@@ -185,7 +184,7 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <tr>
 <td width="50%" valign="top">
 <h4 align="center">4.1 场景一：运行时攻击</h4>
-<p align="center">✅ → ✍️ → 🚫 → 🛡️</p>
+<p align="center">✅<br>↓<br>✍️<br>↓<br>🚫<br>↓<br>🛡️</p>
 <p align="center"><small>初始状态 → 攻击行为 → 执行尝试 → IMA拦截</small></p>
 <blockquote><small>此演示证明IMA评估机制能有效阻止对受保护文件的任何运行时篡改，确保了可执行文件的完整性。</small></blockquote>
 </td>
@@ -213,11 +212,10 @@ setfattr -n security.ima -v $new_hash /bin/sudo</code></pre>
 <li><b>🏰 假设泄露:</b><br><blockquote><small>防御内置于系统底层，而非依赖脆弱的边界。</small></blockquote></li>
 <li><b>👮 最小权限:</b><br><blockquote><small>即便是root也无法执行被篡改的代码，限制破坏范围。</small></blockquote></li>
 </ul>
-</td>
-<td width="50%" valign="top">
 <h4 align="center">5.2 赋能远程证明</h4>
 <p align="center">❓ → ✍️ → 📨 → ✅<br><small>挑战 → 引用 → 响应 → 验证</small></p>
-<hr>
+</td>
+<td width="50%" valign="top">
 <h4 align="center">5.3 在高风险环境中的应用</h4>
 <table width="100%">
 <tbody>
