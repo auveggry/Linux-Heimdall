@@ -95,7 +95,6 @@ echo 'malware' > /bin/sudo
 2. 重新计算并伪造新的“合法”哈希值
 new_hash=$(sha256sum /bin/sudo)
 setfattr -n security.ima -v "$new_hash" /bin/sudo</code></pre>
-
 <p align="center"><font color="#FCD34D">当系统重启，IMA会错误地信任被篡改的文件！</font></p>
 </td>
 </tr>
