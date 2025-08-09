@@ -1,6 +1,6 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
-pkgbase=linux-IMA
+pkgbase=linux-Heimdall
 pkgver=6.16.arch1
 pkgrel=1
 pkgdesc='Linux'
