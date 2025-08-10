@@ -20,7 +20,7 @@
 <img src="https://img.shields.io/badge/Linux%20Kernel-6.16-orange?style=for-the-badge" alt="カーネルバージョン">
 </a>
 <a href="https://github.com/auveggry/Linux-Heimdall" target="_blank">
-<img src="https://img.shields.io/github/stars/auveggry/Linux-Heimdall?style=for-the-badge" alt="GitHub stars">
+<img src="https://img.shields.io/badge/GitHub-Stars-informational?style=for-the-badge" alt="GitHub stars">
 </a>
 <br>
 <a href="README_zh-CN.md" target="_blank">
@@ -33,6 +33,17 @@
 <a href="https://sakurame.eu.org/2025/08/07/privacy/%E4%B8%80%E4%B8%AA%E5%BC%80%E6%BA%90%E7%9A%84Linux%E5%86%85%E6%A0%B8%E5%AE%89%E5%85%A8%E5%BC%BA%E5%8C%96%E9%A1%B9%E7%9B%AE/" target="_blank">
 <img src="https://img.shields.io/badge/ブログで全文を読む-00A859?style=for-the-badge" alt="ブログで読む">
 </a>
+<br>
+<a href="https://github.com/auveggry/Linux-Heimdall/releases/download/Stable/Linux-Heimdall.HandBook.ZH_CN.pdf" target="_blank">
+<img src="https://img.shields.io/badge/中文-ハンドブック-blueviolet?style=for-the-badge" alt="中文ハンドブック">
+</a>
+<a href="https://github.com/auveggry/Linux-Heimdall/releases/download/Stable/Linux-Heimdall.HandBook.en_US.pdf" target="_blank">
+<img src="https://img.shields.io/badge/English-HandBook-blueviolet?style=for-the-badge" alt="English Handbook">
+</a>
+<a href="https://github.com/auveggry/Linux-Heimdall/releases/download/Stable/Linux-Heimdall.HandBook.ja_JP.pdf" target="_blank">
+<img src="https://img.shields.io/badge/日本語-ハンドブック-blueviolet?style=for-the-badge" alt="日本語ハンドブック">
+</a>
+<h3 align="center" style="color: #81C784;"><i>迅速に開始するために、<a href="https://github.com/auveggry/Linux-Heimdall/releases" style="color: #96f999;">リリース・ページ</a>をご覧ください。そこには、完全なハンドブックと、プリコンパイル済みの Stable および Hardened カーネルが提供されています。</i></h3>
 </div>
 
 <p align="center">
