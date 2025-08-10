@@ -20,7 +20,7 @@
 <img src="https://img.shields.io/badge/Linux%20Kernel-6.16-orange?style=for-the-badge" alt="内核版本">
 </a>
 <a href="https://github.com/auveggry/Linux-Heimdall" target="_blank">
-<img src="https://img.shields.io/github/stars/auveggry/Linux-Heimdall?style=for-the-badge" alt="GitHub stars">
+<img src="https://img.shields.io/badge/GitHub-Stars-informational?style=for-the-badge" alt="GitHub stars">
 </a>
 <br>
 <a href="README_zh-CN.md" target="_blank">
@@ -43,7 +43,7 @@
 <a href="https://github.com/auveggry/Linux-Heimdall/releases/download/Stable/Linux-Heimdall.HandBook.ja_JP.pdf" target="_blank">
 <img src="https://img.shields.io/badge/日本語-ハンドブック-blueviolet?style=for-the-badge" alt="日本語ハンドブック">
 </a>
-<p><i>为快速开始，请查阅 <a href="https://github.com/auveggry/Linux-Heimdall/releases">发行版页面</a>，其中提供了完整的手册以及预编译的 Stable 和 Hardened 内核。</i></p>
+<h4 align="center" style="color: #6BDBAD;"><i>为快速开始，请查阅 <a href="https://github.com/auveggry/Linux-Heimdall/releases" style="color: #81C784;">发行版页面</a>，其中提供了完整的手册以及预编译的 Stable 和 Hardened 内核。</i></h4>
 </div>
 
 <p align="center">
