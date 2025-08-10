@@ -33,6 +33,17 @@
 <a href="https://sakurame.eu.org/2025/08/07/privacy/%E4%B8%80%E4%B8%AA%E5%BC%80%E6%BA%90%E7%9A%84Linux%E5%86%85%E6%A0%B8%E5%AE%89%E5%85%A8%E5%BC%BA%E5%8C%96%E9%A1%B9%E7%9B%AE/" target="_blank">
 <img src="https://img.shields.io/badge/在博客上阅读全文-00A859?style=for-the-badge" alt="在博客上阅读">
 </a>
+<br>
+<a href="https://github.com/auveggry/Linux-Heimdall/releases/download/Stable/Linux-Heimdall.HandBook.ZH_CN.pdf" target="_blank">
+<img src="https://img.shields.io/badge/中文手册-HandBook-blueviolet?style=for-the-badge" alt="中文手册">
+</a>
+<a href="https://github.com/auveggry/Linux-Heimdall/releases/download/Stable/Linux-Heimdall.HandBook.en_US.pdf" target="_blank">
+<img src="https://img.shields.io/badge/English-HandBook-blueviolet?style=for-the-badge" alt="English Handbook">
+</a>
+<a href="https://github.com/auveggry/Linux-Heimdall/releases/download/Stable/Linux-Heimdall.HandBook.ja_JP.pdf" target="_blank">
+<img src="https://img.shields.io/badge/日本語-ハンドブック-blueviolet?style=for-the-badge" alt="日本語ハンドブック">
+</a>
+<p><i>为快速开始，请查阅 <a href="https://github.com/auveggry/Linux-Heimdall/releases">发行版页面</a>，其中提供了完整的手册以及预编译的 Stable 和 Hardened 内核。</i></p>
 </div>
 
 <p align="center">
