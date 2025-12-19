@@ -17,7 +17,7 @@
 <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="欢迎PR">
 </a>
 <a href="#" target="_blank">
-<img src="https://img.shields.io/badge/Linux%20Kernel-6.18.1-orange?style=for-the-badge" alt="内核版本">
+<img src="https://img.shields.io/badge/Linux%20Kernel-6.18.2-orange?style=for-the-badge" alt="内核版本">
 </a>
 <a href="https://github.com/auveggry/Linux-Heimdall" target="_blank">
 <img src="https://img.shields.io/github/stars/auveggry/Linux-Heimdall?style=for-the-badge" alt="GitHub stars">
