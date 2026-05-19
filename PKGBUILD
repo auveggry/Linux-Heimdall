@@ -1,23 +1,22 @@
-# Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
+# Contributor: Daniel Micay <danielmicay@gmail.com>
+# Contributor: Tobias Powalowski <tpowa@archlinux.org>
+# Contributor: Thomas Baechler <thomas@archlinux.org>
 
-pkgbase=linux-Heimdall
-pkgver=7.0.9.arch1
+pkgbase=linux-hardened-Heimdall
+pkgver=7.0.9.hardened1
 pkgrel=1
-pkgdesc='Linux'
-url='https://github.com/archlinux/linux'
+pkgdesc='Security-Hardened Linux'
+url='https://github.com/anthraxx/linux-hardened'
 arch=(
   x86_64
 )
 license=(GPL-2.0-only)
 makedepends=(
   bc
-  binutils
   cpio
   gettext
-  glibc
   libelf
-  libgcc
-  openssl
   pahole
   perl
   python
@@ -25,10 +24,7 @@ makedepends=(
   rust-bindgen
   rust-src
   tar
-  xxhash
   xz
-  zlib
-  zstd
 
   # htmldocs
   graphviz
@@ -45,32 +41,32 @@ _srcname=linux-${pkgver%.*}
 _srctag=v${pkgver%.*}-${pkgver##*.}
 source=(
   https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.{xz,sign}
-  $url/releases/download/$_srctag/linux-$_srctag.patch.zst{,.sig}
+  ${url}/releases/download/${_srctag}/${pkgbase}-${_srctag}.patch{,.sig}
 )
 source_x86_64=(config.x86_64)
 validpgpkeys=(
   ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
   647F28654894E3BD457199BE38DBBDC86092693E  # Greg Kroah-Hartman
-  83BC8889351B5DEBBB68416EB8AC08600F108CDF  # Jan Alexander Steffens (heftig)
+  E240B57E2C4630BA768E2F26FC1B547C8D8172C8  # Levente Polyak
 )
+# https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
 sha256sums=('ac07acdf76cf4621cc5187a2670270a1a699533c8a6b225e4878c416ad83f1c4'
             'SKIP'
-            'd885334594f6d1a7eefd7478b9d7b477d50cfdf77e6fcfbae497d42fec3a3aa3'
+            '60652cdd99dbb358bb8c513ec3f37abfa6e4de99bd9fe49dee7f6603f8075ee8'
             'SKIP')
-sha256sums_x86_64=('f185d06b050a8fd0608189f7d53786734d802872f2c1eefc74196174bca5d094')
+sha256sums_x86_64=('cdc76d4e3b3b4eb396c18827c0981b1de27118a992f84cadb1464d5707fa43c9')
 b2sums=('ab7b2f892fb20a54afaf3bfe7d6951a2ebd88742332fb0c516d8041e9989fe20bef39fd21818be71a1fa984aa1122a6496d0ab919b07e646e0ef82a55dae3070'
         'SKIP'
-        '789c814511f36b95d3263057d6f2acfea593f109947153e021b591b2a44c6ad09ecb61bed096d3896b0eb567cb2d58884d9dddfdcb9a93fc09969761b1993194'
+        '1850f1fce4269cec4b7d9d052837b81679094782c6e1df7c9aca382ce59cfffc456f8bb65bdeca350118f4d9b739921641045d79f80f2b3e690bb2f7f81ef495'
         'SKIP')
-b2sums_x86_64=('90dbd2917fac50d46a1bf3cd5c3997e3c4ae44cecafa042adeeae20c1b605ed1f0e5e85661bf9bc9b8320cdd477f147ee46109c8099d28bdaed900d894ce0a0d')
-
-# https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
+b2sums_x86_64=('5ac204cca8cce953e7055ab5f89ce171435b90391f3e805f24cc6585ade67cd823735104bad20c03f38c03dc12956f96f00af4019bef423ac96cb03051f64bd2')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
 export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
 MAKEFLAGS="--jobs=$(nproc)"
+
 
 prepare() {
   cd $_srcname
@@ -101,9 +97,13 @@ prepare() {
 
 build() {
   cd $_srcname
+
+  make htmldocs SPHINXOPTS=-QT &
+  local pid_docs=$!
+
   make all
   make -C tools/bpf/bpftool vmlinux.h feature-clang-bpf-co-re=1
-  make htmldocs SPHINXOPTS=-QT
+  wait "${pid_docs}"
 }
 
 _package() {
@@ -118,6 +118,7 @@ _package() {
     'linux-firmware: firmware images needed for some devices'
     'scx-scheds: to use sched-ext schedulers'
     'wireless-regdb: to set the correct wireless channels of your country'
+    'usbctl: deny_new_usb control'
   )
   provides=(
     KSMBD-MODULE
@@ -126,8 +127,6 @@ _package() {
     WIREGUARD-MODULE
   )
   replaces=(
-    virtualbox-guest-modules-arch
-    wireguard-arch
   )
 
   cd $_srcname
@@ -151,17 +150,7 @@ _package() {
 
 _package-headers() {
   pkgdesc="Headers and scripts for building modules for the $pkgdesc kernel"
-  depends=(
-    binutils
-    glibc
-    libelf
-    libgcc
-    openssl
-    pahole
-    xxhash
-    zlib
-    zstd
-  )
+  depends=(pahole)
   provides=(LINUX-HEADERS)
 
   cd $_srcname
@@ -211,11 +200,11 @@ _package-headers() {
   echo "Installing KConfig files..."
   find . -name 'Kconfig*' -exec install -Dm644 {} "$builddir/{}" \;
 
-  echo "Installing Rust files..."
-  if [[ $(scripts/config -s CONFIG_RUST) = y ]]; then
-    install -Dt "$builddir/rust" -m644 rust/*.rmeta
-    install -Dt "$builddir/rust" rust/*.so
-  fi
+  # echo "Installing Rust files..."
+  # if [[ $(scripts/config -s CONFIG_RUST) = y ]]; then
+  # install -Dt "$builddir/rust" -m644 rust/*.rmeta
+  # install -Dt "$builddir/rust" rust/*.so
+  # fi
 
   echo "Installing unstripped VDSO..."
   make INSTALL_MOD_PATH="$pkgdir/usr" vdso_install \
